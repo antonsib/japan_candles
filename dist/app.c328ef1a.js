@@ -120,7 +120,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 })({"data.json":[function(require,module,exports) {
 module.exports = [{
   "time": "2024-05-27 09:00",
-  "max": "90",
+  "max": "100",
   "min": "40",
   "start": "90",
   "end": "80"
@@ -179,6 +179,17 @@ module.exports = [{
   "start": "50",
   "end": "20"
 }];
+},{}],"fl-data-test.json":[function(require,module,exports) {
+module.exports = {
+  "status": "success",
+  "data": {
+    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956],
+    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12],
+    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680],
+    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18],
+    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000]
+  }
+};
 },{}],"graphing.js":[function(require,module,exports) {
 "use strict";
 
@@ -187,7 +198,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.graphing = graphing;
 var _data = _interopRequireDefault(require("./data.json"));
+var _flDataTest = _interopRequireDefault(require("./fl-data-test.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
@@ -200,91 +216,93 @@ var DPI_WIDTH = WIDTH * 2;
 var DPI_HEIGHT = HEIGHT * 2;
 var PADDING = 40;
 var VIEW_HEIGHT = DPI_HEIGHT - PADDING * 2;
-var ROWS_COUNT = 5;
+var ROWS_COUNT = 10;
 function graphing(canvas) {
   var ctx = canvas.getContext('2d');
   canvas.style.width = WIDTH + 'px';
   canvas.style.height = HEIGHT + 'px';
   canvas.width = DPI_WIDTH;
   canvas.height = DPI_HEIGHT;
-  var _findMinMax = findMinMax(_data.default),
+  var _findMinMax = findMinMax(_flDataTest.default),
     _findMinMax2 = _slicedToArray(_findMinMax, 2),
     yMin = _findMinMax2[0],
     yMax = _findMinMax2[1];
-  var yKof = VIEW_HEIGHT / (yMax - yMin);
-  var xStep = DPI_WIDTH / _data.default.length;
-  var paddingCandle = DPI_WIDTH / _data.default.length / 4;
-  var yStep = VIEW_HEIGHT / ROWS_COUNT;
-  var yStepValue = (yMax - yMin) / ROWS_COUNT;
-  draw(_data.default);
+  var yKof = ((yMax - yMin) / VIEW_HEIGHT).toFixed(2);
+  var xStep = DPI_WIDTH / _flDataTest.default.data.o.length;
+  var paddingCandle = DPI_WIDTH / _flDataTest.default.data.o.length / 4;
+  var yStep = ((yMax - yMin) / ROWS_COUNT).toFixed();
+  draw(_flDataTest.default);
   drawX();
   drawY();
   function drawY() {
-    for (var i = 1; i < _data.default.length; i++) {
+    var step = VIEW_HEIGHT / ROWS_COUNT;
+    for (var i = 0; i < ROWS_COUNT; i++) {
       ctx.beginPath();
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 2;
       ctx.strokeStyle = '#bbb';
       ctx.font = 'normal 20px Helvetica, sans-serif';
       ctx.fillStyle = '#96a2aa';
-      ctx.moveTo(0, DPI_HEIGHT - yStep * i);
-      ctx.fillText(yStepValue * i, 0, DPI_HEIGHT - yStep * i);
+      ctx.moveTo(0, VIEW_HEIGHT - step * i);
+      ctx.fillText(yMin + i * yStep, 0, VIEW_HEIGHT - step * i);
       ctx.stroke();
       ctx.closePath();
     }
   }
   function drawX() {
-    for (var i = 0; i < _data.default.length; i++) {
+    for (var i = 0; i < _flDataTest.default.data.t.length; i++) {
       ctx.beginPath();
       ctx.font = 'normal 20px Helvetica, sans-serif';
       ctx.fillStyle = '#96a2aa';
-      ctx.moveTo(xStep * i + paddingCandle / 2, DPI_HEIGHT - PADDING);
-      ctx.fillText(_data.default[i].time, xStep * i + paddingCandle / 2, DPI_HEIGHT - PADDING);
+      ctx.moveTo(xStep * i + paddingCandle, DPI_HEIGHT - PADDING);
+      var time = new Date(_flDataTest.default.data.t[i] * 1000);
+      ctx.fillText(toDate(time), xStep * i + paddingCandle, DPI_HEIGHT - PADDING);
       ctx.stroke();
       ctx.closePath();
     }
   }
-  function draw(data) {
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].start <= data[i].end) {
+  function draw(data1) {
+    for (var i = 0; i < data1.data.o.length; i++) {
+      if (data1.data.o[i] <= data1.data.c[i]) {
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = "green";
-        ctx.moveTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].min);
-        ctx.lineTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].start);
-        ctx.rect(xStep * i + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].end, paddingCandle * 2, (data[i].end - data[i].start) * yKof);
+        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.l[i] - yMin) / yKof);
+        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.o[i] - yMin) / yKof);
+        ctx.rect(xStep * i + paddingCandle, VIEW_HEIGHT - (data1.data.c[i] - yMin) / yKof, paddingCandle * 2, (data1.data.c[i] - data1.data.o[i]) / yKof);
         ctx.fillStyle = 'green';
         ctx.fill();
-        ctx.moveTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].end);
-        ctx.lineTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].max);
+        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.c[i] - yMin) / yKof);
+        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.h[i] - yMin) / yKof);
         ctx.stroke();
         ctx.closePath();
-      } else if (data[i].start > data[i].end) {
+      } else if (data1.data.o[i] > data1.data.c[i]) {
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = "red";
-        ctx.moveTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].min);
-        ctx.lineTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].end);
-        ctx.rect(xStep * i + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].start, paddingCandle * 2, (data[i].start - data[i].end) * yKof);
+        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.l[i] - yMin) / yKof);
+        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.c[i] - yMin) / yKof);
+        ctx.rect(xStep * i + paddingCandle, VIEW_HEIGHT - (data1.data.o[i] - yMin) / yKof, paddingCandle * 2, (data1.data.o[i] - data1.data.c[i]) / yKof);
         ctx.fillStyle = 'red';
         ctx.fill();
-        ctx.moveTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].start);
-        ctx.lineTo(xStep * i + paddingCandle + paddingCandle / 2, DPI_HEIGHT - yKof * data[i].max);
+        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.o[i] - yMin) / yKof);
+        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.h[i] - yMin) / yKof);
         ctx.stroke();
         ctx.closePath();
       }
     }
   }
   function findMinMax(data) {
-    var min = data[0].min;
-    var max = data[0].max;
-    for (var i = 1; i < data.length; i++) {
-      if (data[i].min < min) min = data[i].min;
-      if (data[i].max > max) max = data[i].max;
-    }
+    var min = Math.min.apply(Math, _toConsumableArray(data.data.l));
+    var max = Math.max.apply(Math, _toConsumableArray(data.data.h));
     return [min, max];
   }
+  function toDate(timestamp) {
+    var shortMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var date = new Date(timestamp);
+    return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
+  }
 }
-},{"./data.json":"data.json"}],"app.js":[function(require,module,exports) {
+},{"./data.json":"data.json","./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 var _graphing = require("./graphing.js");
@@ -314,7 +332,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64453" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65478" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
