@@ -117,69 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"data.json":[function(require,module,exports) {
-module.exports = [{
-  "time": "2024-05-27 09:00",
-  "max": "100",
-  "min": "40",
-  "start": "90",
-  "end": "80"
-}, {
-  "time": "2024-05-27 10:00",
-  "max": "50",
-  "min": "10",
-  "start": "40",
-  "end": "20"
-}, {
-  "time": "2024-05-27 11:00",
-  "max": "70",
-  "min": "50",
-  "start": "60",
-  "end": "60"
-}, {
-  "time": "2024-05-27 12:00",
-  "max": "55",
-  "min": "25",
-  "start": "25",
-  "end": "40"
-}, {
-  "time": "2024-05-27 13:00",
-  "max": "85",
-  "min": "40",
-  "start": "50",
-  "end": "85"
-}, {
-  "time": "2024-05-27 14:00",
-  "max": "70",
-  "min": "30",
-  "start": "40",
-  "end": "60"
-}, {
-  "time": "2024-05-27 15:00",
-  "max": "60",
-  "min": "20",
-  "start": "30",
-  "end": "40"
-}, {
-  "time": "2024-05-27 16:00",
-  "max": "90",
-  "min": "70",
-  "start": "75",
-  "end": "85"
-}, {
-  "time": "2024-05-27 17:00",
-  "max": "50",
-  "min": "10",
-  "start": "20",
-  "end": "40"
-}, {
-  "time": "2024-05-27 18:00",
-  "max": "50",
-  "min": "10",
-  "start": "50",
-  "end": "20"
-}];
-},{}],"fl-data-test.json":[function(require,module,exports) {
+})({"fl-data-test.json":[function(require,module,exports) {
 module.exports = {
   "status": "success",
   "data": {
@@ -197,7 +135,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.graphing = graphing;
-var _data = _interopRequireDefault(require("./data.json"));
 var _flDataTest = _interopRequireDefault(require("./fl-data-test.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
@@ -210,7 +147,10 @@ function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) 
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-var WIDTH = 1400;
+//import data1 from "./fl-data-test1.json"
+//import data1 from "./fl-data.json"
+
+var WIDTH = 1300;
 var HEIGHT = 450;
 var DPI_WIDTH = WIDTH * 2;
 var DPI_HEIGHT = HEIGHT * 2;
@@ -223,15 +163,19 @@ function graphing(canvas) {
   canvas.style.height = HEIGHT + 'px';
   canvas.width = DPI_WIDTH;
   canvas.height = DPI_HEIGHT;
+  var LENGTH = _flDataTest.default.data.o.length;
   var _findMinMax = findMinMax(_flDataTest.default),
     _findMinMax2 = _slicedToArray(_findMinMax, 2),
     yMin = _findMinMax2[0],
     yMax = _findMinMax2[1];
   var yKof = ((yMax - yMin) / VIEW_HEIGHT).toFixed(2);
-  var xStep = DPI_WIDTH / _flDataTest.default.data.o.length;
-  var paddingCandle = DPI_WIDTH / _flDataTest.default.data.o.length / 4;
   var yStep = ((yMax - yMin) / ROWS_COUNT).toFixed();
-  draw(_flDataTest.default);
+  var paddingY = 80;
+  var xWidth = DPI_WIDTH - paddingY;
+  var step = (xWidth / LENGTH).toFixed();
+  var padding = (step / 4).toFixed();
+  var widthCandle = 2 * padding;
+  draw();
   drawX();
   drawY();
   function drawY() {
@@ -249,47 +193,19 @@ function graphing(canvas) {
     }
   }
   function drawX() {
-    for (var i = 0; i < _flDataTest.default.data.t.length; i++) {
-      ctx.beginPath();
-      ctx.font = 'normal 20px Helvetica, sans-serif';
-      ctx.fillStyle = '#96a2aa';
-      ctx.moveTo(xStep * i + paddingCandle, DPI_HEIGHT - PADDING);
-      var time = new Date(_flDataTest.default.data.t[i] * 1000);
-      ctx.fillText(toDate(time), xStep * i + paddingCandle, DPI_HEIGHT - PADDING);
-      ctx.stroke();
-      ctx.closePath();
-    }
-  }
-  function draw(data1) {
-    for (var i = 0; i < data1.data.o.length; i++) {
-      if (data1.data.o[i] <= data1.data.c[i]) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "green";
-        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.l[i] - yMin) / yKof);
-        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.o[i] - yMin) / yKof);
-        ctx.rect(xStep * i + paddingCandle, VIEW_HEIGHT - (data1.data.c[i] - yMin) / yKof, paddingCandle * 2, (data1.data.c[i] - data1.data.o[i]) / yKof);
-        ctx.fillStyle = 'green';
-        ctx.fill();
-        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.c[i] - yMin) / yKof);
-        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.h[i] - yMin) / yKof);
-        ctx.stroke();
-        ctx.closePath();
-      } else if (data1.data.o[i] > data1.data.c[i]) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "red";
-        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.l[i] - yMin) / yKof);
-        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.c[i] - yMin) / yKof);
-        ctx.rect(xStep * i + paddingCandle, VIEW_HEIGHT - (data1.data.o[i] - yMin) / yKof, paddingCandle * 2, (data1.data.o[i] - data1.data.c[i]) / yKof);
-        ctx.fillStyle = 'red';
-        ctx.fill();
-        ctx.moveTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.o[i] - yMin) / yKof);
-        ctx.lineTo(xStep * i + paddingCandle * 2, VIEW_HEIGHT - (data1.data.h[i] - yMin) / yKof);
-        ctx.stroke();
-        ctx.closePath();
+    var stepValue = (LENGTH / ROWS_COUNT).toFixed();
+    ctx.beginPath();
+    ctx.font = 'normal 20px Helvetica, sans-serif';
+    ctx.fillStyle = '#96a2aa';
+    for (var i = 0, j = 1; i < LENGTH; i++, j += 2) {
+      if ((i - 1) % stepValue === 0) {
+        ctx.moveTo(paddingY + widthCandle * j - padding, DPI_HEIGHT - PADDING);
+        var time = new Date(_flDataTest.default.data.t[i] * 1000);
+        ctx.fillText(toDate(time), paddingY + j * widthCandle - padding, DPI_HEIGHT - PADDING);
       }
     }
+    ctx.stroke();
+    ctx.closePath();
   }
   function findMinMax(data) {
     var min = Math.min.apply(Math, _toConsumableArray(data.data.l));
@@ -301,8 +217,39 @@ function graphing(canvas) {
     var date = new Date(timestamp);
     return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
   }
+  function draw() {
+    for (var i = 0, j = 1; i < LENGTH; i++, j += 2) {
+      if (_flDataTest.default.data.o[i] <= _flDataTest.default.data.c[i]) {
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "green";
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.l[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.o[i] - yMin) / yKof);
+        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (_flDataTest.default.data.c[i] - yMin) / yKof, padding * 2, (_flDataTest.default.data.c[i] - _flDataTest.default.data.o[i]) / yKof);
+        ctx.fillStyle = 'green';
+        ctx.fill();
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.c[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.h[i] - yMin) / yKof);
+        ctx.stroke();
+        ctx.closePath();
+      } else if (_flDataTest.default.data.o[i] > _flDataTest.default.data.c[i]) {
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "red";
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.l[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.c[i] - yMin) / yKof);
+        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (_flDataTest.default.data.o[i] - yMin) / yKof, padding * 2, (_flDataTest.default.data.o[i] - _flDataTest.default.data.c[i]) / yKof);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.o[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.h[i] - yMin) / yKof);
+        ctx.stroke();
+        ctx.closePath();
+      }
+    }
+  }
 }
-},{"./data.json":"data.json","./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
+},{"./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 var _graphing = require("./graphing.js");
@@ -332,7 +279,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65478" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56749" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
