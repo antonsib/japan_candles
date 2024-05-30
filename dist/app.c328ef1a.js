@@ -117,15 +117,39 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"fl-data-test.json":[function(require,module,exports) {
+})({"utils.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.findMinMax = findMinMax;
+exports.toDate = toDate;
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function findMinMax(data) {
+  var min = Math.min.apply(Math, _toConsumableArray(data.data.l));
+  var max = Math.max.apply(Math, _toConsumableArray(data.data.h));
+  return [min, max];
+}
+function toDate(timestamp) {
+  var shortMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var date = new Date(timestamp);
+  return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
+}
+},{}],"fl-data-test1.json":[function(require,module,exports) {
 module.exports = {
   "status": "success",
   "data": {
-    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956],
-    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12],
-    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680],
-    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18],
-    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000]
+    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18, 62700.41, 63195.12, 63516.18, 63288.48, 63242.18, 62559.22, 63094.76, 63047.88, 62687.12, 62092.12, 61762.19, 62730.89, 62490.36, 63003.92, 62721.42, 63019.72, 64017.46, 63782.56, 63793.39],
+    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12, 62887.99, 63254.87, 63799.99, 63659.99, 63578.33, 63340.65, 63269.95, 63422.96, 63342.51, 63099.99, 62414.99, 62721.01, 63280.74, 63041.84, 63094.79, 63047.25, 64364.99, 64079.99, 63876.63, 64239.66],
+    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680, 62366.44, 62636.73, 63104.4, 63077.02, 63198.67, 61600, 62366.44, 62811.87, 62136.28, 62023.17, 61735.42, 61694.9, 62282.01, 62430.41, 62650.55, 62555, 62973.83, 63613.71, 63623.32, 63581.16],
+    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18, 62700.41, 63195.12, 63516.18, 63288.48, 63242.18, 62559.22, 63094.76, 63047.88, 62687.12, 62092.12, 61762.19, 62721.01, 62490.36, 63003.92, 62721.42, 63019.72, 64017.46, 63782.56, 63793.39, 64022.59],
+    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000, 1713243600, 1713247200, 1713250800, 1713254400, 1713258000, 1713261600, 1713265200, 1713268800, 1713272400, 1713276000, 1713279600, 1713283200, 1713286800, 1713290400, 1713294000, 1713297600, 1713301200, 1713304800, 1713308400, 1713312000]
   }
 };
 },{}],"graphing.js":[function(require,module,exports) {
@@ -135,20 +159,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.graphing = graphing;
-var _flDataTest = _interopRequireDefault(require("./fl-data-test.json"));
+var _utils = require("./utils");
+var _flDataTest = _interopRequireDefault(require("./fl-data-test1.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-//import data1 from "./fl-data-test1.json"
-//import data1 from "./fl-data.json"
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 from "./fl-data-test.json" // 10 свечей
+//30 свечей
+//import data1 from "./fl-data.json"  // 1001 свеча
 
 var WIDTH = 1300;
 var HEIGHT = 450;
@@ -164,7 +185,7 @@ function graphing(canvas) {
   canvas.width = DPI_WIDTH;
   canvas.height = DPI_HEIGHT;
   var LENGTH = _flDataTest.default.data.o.length;
-  var _findMinMax = findMinMax(_flDataTest.default),
+  var _findMinMax = (0, _utils.findMinMax)(_flDataTest.default),
     _findMinMax2 = _slicedToArray(_findMinMax, 2),
     yMin = _findMinMax2[0],
     yMax = _findMinMax2[1];
@@ -175,22 +196,22 @@ function graphing(canvas) {
   var step = (xWidth / LENGTH).toFixed();
   var padding = (step / 4).toFixed();
   var widthCandle = 2 * padding;
-  draw();
   drawX();
   drawY();
+  draw();
   function drawY() {
     var step = VIEW_HEIGHT / ROWS_COUNT;
+    ctx.beginPath();
+    ctx.lineWidth = 2;
     for (var i = 0; i < ROWS_COUNT; i++) {
-      ctx.beginPath();
-      ctx.lineWidth = 2;
       ctx.strokeStyle = '#bbb';
       ctx.font = 'normal 20px Helvetica, sans-serif';
       ctx.fillStyle = '#96a2aa';
       ctx.moveTo(0, VIEW_HEIGHT - step * i);
       ctx.fillText(yMin + i * yStep, 0, VIEW_HEIGHT - step * i);
-      ctx.stroke();
-      ctx.closePath();
     }
+    ctx.stroke();
+    ctx.closePath();
   }
   function drawX() {
     var stepValue = (LENGTH / ROWS_COUNT).toFixed();
@@ -201,21 +222,11 @@ function graphing(canvas) {
       if ((i - 1) % stepValue === 0) {
         ctx.moveTo(paddingY + widthCandle * j - padding, DPI_HEIGHT - PADDING);
         var time = new Date(_flDataTest.default.data.t[i] * 1000);
-        ctx.fillText(toDate(time), paddingY + j * widthCandle - padding, DPI_HEIGHT - PADDING);
+        ctx.fillText((0, _utils.toDate)(time), paddingY + j * widthCandle - padding, DPI_HEIGHT - PADDING);
       }
     }
     ctx.stroke();
     ctx.closePath();
-  }
-  function findMinMax(data) {
-    var min = Math.min.apply(Math, _toConsumableArray(data.data.l));
-    var max = Math.max.apply(Math, _toConsumableArray(data.data.h));
-    return [min, max];
-  }
-  function toDate(timestamp) {
-    var shortMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var date = new Date(timestamp);
-    return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
   }
   function draw() {
     for (var i = 0, j = 1; i < LENGTH; i++, j += 2) {
@@ -249,7 +260,7 @@ function graphing(canvas) {
     }
   }
 }
-},{"./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
+},{"./utils":"utils.js","./fl-data-test1.json":"fl-data-test1.json"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 var _graphing = require("./graphing.js");
@@ -279,7 +290,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56749" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58641" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
