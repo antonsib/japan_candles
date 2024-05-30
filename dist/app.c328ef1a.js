@@ -141,15 +141,15 @@ function toDate(timestamp) {
   var date = new Date(timestamp);
   return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
 }
-},{}],"fl-data-test1.json":[function(require,module,exports) {
+},{}],"fl-data-test.json":[function(require,module,exports) {
 module.exports = {
   "status": "success",
   "data": {
-    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18, 62700.41, 63195.12, 63516.18, 63288.48, 63242.18, 62559.22, 63094.76, 63047.88, 62687.12, 62092.12, 61762.19, 62730.89, 62490.36, 63003.92, 62721.42, 63019.72, 64017.46, 63782.56, 63793.39],
-    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12, 62887.99, 63254.87, 63799.99, 63659.99, 63578.33, 63340.65, 63269.95, 63422.96, 63342.51, 63099.99, 62414.99, 62721.01, 63280.74, 63041.84, 63094.79, 63047.25, 64364.99, 64079.99, 63876.63, 64239.66],
-    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680, 62366.44, 62636.73, 63104.4, 63077.02, 63198.67, 61600, 62366.44, 62811.87, 62136.28, 62023.17, 61735.42, 61694.9, 62282.01, 62430.41, 62650.55, 62555, 62973.83, 63613.71, 63623.32, 63581.16],
-    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18, 62700.41, 63195.12, 63516.18, 63288.48, 63242.18, 62559.22, 63094.76, 63047.88, 62687.12, 62092.12, 61762.19, 62721.01, 62490.36, 63003.92, 62721.42, 63019.72, 64017.46, 63782.56, 63793.39, 64022.59],
-    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000, 1713243600, 1713247200, 1713250800, 1713254400, 1713258000, 1713261600, 1713265200, 1713268800, 1713272400, 1713276000, 1713279600, 1713283200, 1713286800, 1713290400, 1713294000, 1713297600, 1713301200, 1713304800, 1713308400, 1713312000]
+    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956],
+    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12],
+    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680],
+    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18],
+    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000]
   }
 };
 },{}],"graphing.js":[function(require,module,exports) {
@@ -160,15 +160,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.graphing = graphing;
 var _utils = require("./utils");
-var _flDataTest = _interopRequireDefault(require("./fl-data-test1.json"));
+var _flDataTest = _interopRequireDefault(require("./fl-data-test.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 from "./fl-data-test.json" // 10 свечей
-//30 свечей
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 from "./fl-data-test3.json" //1 свечa
+//import data1 from "./fl-data-test2.json" //2 свечи
+// 10 свечей
+//import data1 from "./fl-data-test1.json" //30 свечей
+//import data1 from "./fl-data-test4.json" //50 свечей
 //import data1 from "./fl-data.json"  // 1001 свеча
 
 var WIDTH = 1300;
@@ -189,16 +192,91 @@ function graphing(canvas) {
     _findMinMax2 = _slicedToArray(_findMinMax, 2),
     yMin = _findMinMax2[0],
     yMax = _findMinMax2[1];
-  var yKof = ((yMax - yMin) / VIEW_HEIGHT).toFixed(2);
-  var yStep = ((yMax - yMin) / ROWS_COUNT).toFixed();
+  var yKof = (yMax - yMin) / VIEW_HEIGHT;
+  var yStep = Math.round((yMax - yMin) / ROWS_COUNT);
   var paddingY = 80;
   var xWidth = DPI_WIDTH - paddingY;
-  var step = (xWidth / LENGTH).toFixed();
-  var padding = (step / 4).toFixed();
+  var step = Math.round(xWidth / LENGTH);
+  var padding = Math.round(step / 4);
   var widthCandle = 2 * padding;
-  drawX();
-  drawY();
-  draw();
+  var raf;
+  var proxy = new Proxy({}, {
+    set: function set() {
+      var result = Reflect.set.apply(Reflect, arguments);
+      //raf = requestAnimationFrame(paint) //перерисовка
+      raf = requestAnimationFrame(paint);
+      return result;
+    }
+  });
+  proxy.scroll = 0;
+  proxy.pos = 0;
+  document.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      proxy.scroll += 10;
+    } else {
+      proxy.scroll -= 10;
+    }
+  }, {
+    passive: false
+  });
+  document.getElementById("canvas").addEventListener("mousemove", function (event) {
+    var x = event.clientX; // получаем координату X мыши
+    var y = event.clientY; // получаем координату Y мыши
+    // console.log(`Координаты мыши: x=${x}, y=${y}`); // выводим координаты мыши в консоль
+    var pos = Math.trunc((x * 2 - paddingY) / step) + 1;
+    proxy.pos = pos;
+    //console.log(pos)
+  });
+  function filterDate(datad, index1, index2) {
+    datad.data.o = datad.data.o.slice(index1, index2);
+    datad.data.h = datad.data.h.slice(index1, index2);
+    datad.data.l = datad.data.l.slice(index1, index2);
+    datad.data.c = datad.data.c.slice(index1, index2);
+    datad.data.t = datad.data.t.slice(index1, index2);
+    return datad;
+  }
+  function compareDate(datad, index, length, pr) {
+    if (pr >= 0 && pr <= 100) {
+      var len1 = index + 1;
+      var len2 = length - index;
+      var len1_1 = Math.round(len1 - pr * len1 / 100);
+      var len2_1 = Math.round(len2 - pr * len2 / 100);
+      var index1 = index - len1_1 + 1;
+      var index2 = index + len2_1;
+
+      //console.log(index1,index2)
+
+      if (index2 === index1 + 1) {
+        //b= data.data.o.slice(index1,index2+1)
+        var res = filterDate(datad, index1, index2 + 1);
+      } else if (index2 === index1) {
+        //b=data.data.o.slice(index1,index2+1)
+        var _res = filterDate(datad, index1, index2 + 1);
+        // return res
+      } else if (index2 < index1) {
+        //b=data.data.o.slice(index2,index1)
+        var _res2 = filterDate(datad, index2, index1);
+      } else {
+        //b = data.data.o.slice(index1,index2)
+        var _res3 = filterDate(datad, index1, index2);
+      }
+    }
+  }
+  function clear() {
+    ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT);
+  }
+  function paint() {
+    clear();
+    if (proxy.scroll > 100) proxy.scroll = 100;
+    if (proxy.scroll < 0) proxy.scroll = 0;
+    var copiedData = structuredClone(_flDataTest.default);
+    compareDate(copiedData, proxy.pos - 1, _flDataTest.default.data.o.length, proxy.scroll);
+    console.log(copiedData.data);
+    drawX();
+    drawY();
+    draw();
+  }
   function drawY() {
     var step = VIEW_HEIGHT / ROWS_COUNT;
     ctx.beginPath();
@@ -215,6 +293,7 @@ function graphing(canvas) {
   }
   function drawX() {
     var stepValue = (LENGTH / ROWS_COUNT).toFixed();
+    if (stepValue == 0) stepValue = 1;
     ctx.beginPath();
     ctx.font = 'normal 20px Helvetica, sans-serif';
     ctx.fillStyle = '#96a2aa';
@@ -222,7 +301,7 @@ function graphing(canvas) {
       if ((i - 1) % stepValue === 0) {
         ctx.moveTo(paddingY + widthCandle * j - padding, DPI_HEIGHT - PADDING);
         var time = new Date(_flDataTest.default.data.t[i] * 1000);
-        ctx.fillText((0, _utils.toDate)(time), paddingY + j * widthCandle - padding, DPI_HEIGHT - PADDING);
+        ctx.fillText((0, _utils.toDate)(time), paddingY + j * widthCandle, DPI_HEIGHT - PADDING);
       }
     }
     ctx.stroke();
@@ -260,7 +339,7 @@ function graphing(canvas) {
     }
   }
 }
-},{"./utils":"utils.js","./fl-data-test1.json":"fl-data-test1.json"}],"app.js":[function(require,module,exports) {
+},{"./utils":"utils.js","./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 var _graphing = require("./graphing.js");
@@ -290,7 +369,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58641" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49811" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

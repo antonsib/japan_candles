@@ -1,6 +1,9 @@
 import { findMinMax, toDate } from "./utils"
-//import data1 from "./fl-data-test.json" // 10 свечей
-import data1 from "./fl-data-test1.json" //30 свечей
+//import data1 from "./fl-data-test3.json" //1 свечa
+//import data1 from "./fl-data-test2.json" //2 свечи
+import data1 from "./fl-data-test.json" // 10 свечей
+//import data1 from "./fl-data-test1.json" //30 свечей
+//import data1 from "./fl-data-test4.json" //50 свечей
 //import data1 from "./fl-data.json"  // 1001 свеча
 
 const WIDTH = 1300 
@@ -21,20 +24,144 @@ export function graphing (canvas){
   
   const LENGTH = data1.data.o.length   
    const [yMin, yMax] =  findMinMax(data1)
-   const yKof = ((yMax - yMin) / VIEW_HEIGHT).toFixed(2)
-   const yStep = ((yMax - yMin) / ROWS_COUNT).toFixed()
+   const yKof = ((yMax - yMin) / VIEW_HEIGHT)
+   const yStep = Math.round(((yMax - yMin) / ROWS_COUNT))
    
    const paddingY = 80
    const xWidth = DPI_WIDTH - paddingY
-   const step = (xWidth/LENGTH).toFixed()
-   const padding = (step / 4).toFixed()
+   const step = Math.round((xWidth/LENGTH))
+   const padding = Math.round((step / 4))
    const widthCandle = 2 * padding
+   let raf
+
+    const proxy = new Proxy({}, {
+    set(...arg){
+       const result= Reflect.set(...arg)
+       //raf = requestAnimationFrame(paint) //перерисовка
+       raf = requestAnimationFrame(paint)
+       return result
+    },
+  })
+
+   
+  proxy.scroll = 0
+  proxy.pos = 0
+ 
+    document.addEventListener("wheel",function(e){
+    e.preventDefault();
+    if(e.deltaY < 0) {
+       proxy.scroll +=10
+      }
+    else{
+      proxy.scroll-=10
+    } 
+    },{passive: false})
    
    
-   drawX()
-   drawY()
-   draw()
+
+    
+   document.getElementById("canvas").addEventListener("mousemove", function (event) {
+    const x = event.clientX; // получаем координату X мыши
+    const y = event.clientY; // получаем координату Y мыши
+   // console.log(`Координаты мыши: x=${x}, y=${y}`); // выводим координаты мыши в консоль
+    const pos = Math.trunc(((x * 2 - paddingY)/step)) + 1
+    proxy.pos = pos
+    //console.log(pos)
+    })
+    
+    function filterDate(datad,index1,index2){
+      datad.data.o = datad.data.o.slice(index1,index2)
+      datad.data.h = datad.data.h.slice(index1,index2)
+      datad.data.l = datad.data.l.slice(index1,index2)
+      datad.data.c = datad.data.c.slice(index1,index2)
+      datad.data.t = datad.data.t.slice(index1,index2)
+      return datad
+    }
+  
+    
+    function compareDate(datad,index, length ,pr ){
+      if(pr >= 0 && pr <= 100){
+          let len1 = index  + 1
+          let len2 = length - index 
+        
+          let len1_1 = Math.round(len1 - (pr * len1)/100)
+          let len2_1 = Math.round(len2 - (pr * len2)/100)
+        
+          let index1 = index - len1_1 + 1
+          let index2 = index + len2_1 
+          
+          //console.log(index1,index2)
+          
+          if(index2 === index1+1){
+             //b= data.data.o.slice(index1,index2+1)
+             const res = filterDate(datad,index1,index2+1)
+          }
+          else if (index2===index1){
+            //b=data.data.o.slice(index1,index2+1)
+            const res = filterDate(datad,index1,index2+1)
+           // return res
+          }
+          else if (index2 < index1){
+              //b=data.data.o.slice(index2,index1)
+              const res = filterDate(datad,index2,index1)
+          }
+          else {
+              //b = data.data.o.slice(index1,index2)
+              const res = filterDate(datad,index1,index2)
+          }
+          
+       }
+    }
+    
+  function clear(){
+      ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT)
+  }
+
+  function paint(){
+    clear()
+    
+    if(proxy.scroll > 100 ) proxy.scroll = 100
+      if (proxy.scroll < 0) proxy.scroll = 0
+    const copiedData = structuredClone(data1)
+    compareDate(copiedData, proxy.pos -1, data1.data.o.length, proxy.scroll)
+
+    
+
+    console.log(copiedData.data)
+ 
+
+    
+    drawX()
+    drawY()
+    draw()
+    }
    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    function drawY(){
       const step = VIEW_HEIGHT / ROWS_COUNT
@@ -52,7 +179,8 @@ export function graphing (canvas){
     }
    
    function drawX(){
-    const stepValue = (LENGTH / ROWS_COUNT).toFixed()
+    let stepValue = (LENGTH / ROWS_COUNT).toFixed() 
+    if(stepValue == 0) stepValue = 1
     ctx.beginPath()
     ctx.font = 'normal 20px Helvetica, sans-serif'
     ctx.fillStyle = '#96a2aa'
@@ -60,7 +188,7 @@ export function graphing (canvas){
        if((i-1) % stepValue === 0){
         ctx.moveTo( paddingY +  widthCandle * j  - padding, DPI_HEIGHT - PADDING)
         const time = new Date(data1.data.t[i] * 1000)
-        ctx.fillText( toDate(time), paddingY + j * widthCandle - padding , DPI_HEIGHT - PADDING)
+        ctx.fillText( toDate(time), paddingY + j * widthCandle , DPI_HEIGHT - PADDING)
        }
     }
     ctx.stroke()
