@@ -70,35 +70,7 @@ export function graphing (canvas){
       
       return datad
     }
-        
-    function compareDate(datad,index, length ,pr ){  //verno
-      if(pr => 0 && pr <= 100){
-  
-          let len1 = index  
-          let len2 = length - index -1
-        
-          let len1_1 = Math.round(len1 - (pr * len1)/100)
-          let len2_1 = Math.round(len2 - (pr * len2)/100)
-        
-          let index1 = index - len1_1 
-          let index2 = index + len2_1 
-          
-          if(index2 === index1+1){
-             const res = filterDate(datad,index1,index2+1)
-          }
-          else if (index2===index1){
-            const res = filterDate(datad,index1,index2+1)
-          }
-          else if (index2 < index1){
-              const res = filterDate(datad,index2,index1+1)
-          }
-          else {
-              const res = filterDate(datad,index1,index2+1)
-          }
-          
-       }
-    }
-    
+         
   function clear(){
       ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT)
   }
