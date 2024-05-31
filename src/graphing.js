@@ -1,8 +1,8 @@
 import { findMinMax, toDate } from "./utils"
 //import data1 from "./fl-data-test3.json" //1 свечa
 //import data1 from "./fl-data-test2.json" //2 свечи
-import data1 from "./fl-data-test.json" // 10 свечей
-//import data1 from "./fl-data-test1.json" //30 свечей
+//import data1 from "./fl-data-test.json" // 10 свечей
+import data1 from "./fl-data-test1.json" //30 свечей
 //import data1 from "./fl-data-test4.json" //50 свечей
 //import data1 from "./fl-data.json"  // 1001 свеча
 
@@ -29,7 +29,7 @@ export function graphing (canvas){
      let step = Math.round((xWidth/LENGTH))
      let padding = Math.round((step / 4))
      let widthCandle = 2 * padding
-     
+     const copiedData = structuredClone(data1)
    let raf
    
    
@@ -41,8 +41,6 @@ export function graphing (canvas){
     },
   })
  
- 
-   
   proxy.scroll = 0
   proxy.pr = 10
   
@@ -50,10 +48,10 @@ export function graphing (canvas){
     document.addEventListener("wheel",function(e){
     e.preventDefault();
     if(e.deltaY < 0) {
-       proxy.scroll +=10
+       proxy.scroll = 10
       }
     else{
-      proxy.scroll-=10
+      proxy.scroll = -10
     } 
     },{passive: false})
    
@@ -105,18 +103,64 @@ export function graphing (canvas){
       ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT)
   }
   
+  function deleteLast(datad){
+    datad.data.o.pop()
+    datad.data.h.pop()
+    datad.data.l.pop()
+    datad.data.c.pop()
+    datad.data.t.pop()
+  }
+
+  function deleteFirst(datad){
+    datad.data.o.shift()
+    datad.data.h.shift()
+    datad.data.l.shift()
+    datad.data.c.shift()
+    datad.data.t.shift()
+  }
+  
+  function addLast(datad, index){
+    datad.data.o.push(data1.data.o[index])
+    datad.data.h.push(data1.data.h[index])
+    datad.data.l.push(data1.data.l[index])
+    datad.data.c.push(data1.data.c[index])
+    datad.data.t.push(data1.data.t[index])
+  }
+
+  function addFirst(datad, index){
+    datad.data.o.unshift(data1.data.o[index])
+    datad.data.h.unshift(data1.data.h[index])
+    datad.data.l.unshift(data1.data.l[index])
+    datad.data.c.unshift(data1.data.c[index])
+    datad.data.t.unshift(data1.data.t[index])
+  }
+
+  function getNewDate(datad, scroll, index){
+    if (scroll === 10 ) {
+         if (datad.data.o[index +1] !== undefined){
+            deleteLast(datad)
+         }
+         if (datad.data.o[index -1 ]!== undefined){
+             deleteFirst(datad)
+         }
+    }
+    if (scroll === -10){
+      let indexd1 = data1.data.o.indexOf(datad.data.o[datad.data.o.length - 1])
+      let indexd2 = data1.data.o.indexOf(datad.data.o[0])
+      if (data1.data.o[indexd1 +1 ] !== undefined){
+        addLast(datad, indexd1 +1 )
+     }
+     if (data1.data.o[indexd2 -1 ]!== undefined){
+      addFirst(datad, indexd2-1 )
+     }
+    }
+  }
+
+
   function paint(){
-    clear()
-    if(proxy.scroll > 100 ) proxy.scroll = 100
-    if (proxy.scroll < 0) proxy.scroll = 0
-
-    
+    clear()    
     const pos = Math.trunc(((curPos * 2 - paddingY)/step))
-
-    const copiedData = structuredClone(data1)
-    compareDate(copiedData, pos, LENGTH, proxy.scroll)
-    //console.log(copiedData.data)
-    console.log(proxy.scroll)
+    getNewDate(copiedData, proxy.scroll, pos)
   
     const newLength = copiedData.data.o.length
 
@@ -127,8 +171,7 @@ export function graphing (canvas){
     const [yMin, yMax] =  findMinMax(copiedData)
     const yKof = ((yMax - yMin) / VIEW_HEIGHT)
     const yStep = Math.round(((yMax - yMin) / ROWS_COUNT))
-    
-    
+  
     drawX(copiedData, newLength )
     drawY(yMin, yStep)
     draw(copiedData, newLength,yKof, yMin)
@@ -209,5 +252,4 @@ export function graphing (canvas){
       }
     }
 
-    //paint()
 }

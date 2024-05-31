@@ -141,15 +141,15 @@ function toDate(timestamp) {
   var date = new Date(timestamp);
   return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
 }
-},{}],"fl-data-test.json":[function(require,module,exports) {
+},{}],"fl-data-test1.json":[function(require,module,exports) {
 module.exports = {
   "status": "success",
   "data": {
-    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956],
-    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12],
-    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680],
-    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18],
-    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000]
+    "o": [63170.86, 63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18, 62700.41, 63195.12, 63516.18, 63288.48, 63242.18, 62559.22, 63094.76, 63047.88, 62687.12, 62092.12, 61762.19, 62730.89, 62490.36, 63003.92, 62721.42, 63019.72, 64017.46, 63782.56, 63793.39],
+    "h": [63632.49, 63633.01, 63473.51, 63527.3, 63557.99, 63719.97, 63899.68, 63498.04, 63554.98, 63029.12, 62887.99, 63254.87, 63799.99, 63659.99, 63578.33, 63340.65, 63269.95, 63422.96, 63342.51, 63099.99, 62414.99, 62721.01, 63280.74, 63041.84, 63094.79, 63047.25, 64364.99, 64079.99, 63876.63, 64239.66],
+    "l": [62274.4, 62942.81, 62638, 62747.17, 63179.21, 62933.33, 63089, 62750, 62799.99, 61680, 62366.44, 62636.73, 63104.4, 63077.02, 63198.67, 61600, 62366.44, 62811.87, 62136.28, 62023.17, 61735.42, 61694.9, 62282.01, 62430.41, 62650.55, 62555, 62973.83, 63613.71, 63623.32, 63581.16],
+    "c": [63300.09, 63112.96, 63262.93, 63459.98, 63419.99, 63254.73, 63148, 63401.55, 62956, 62486.18, 62700.41, 63195.12, 63516.18, 63288.48, 63242.18, 62559.22, 63094.76, 63047.88, 62687.12, 62092.12, 61762.19, 62721.01, 62490.36, 63003.92, 62721.42, 63019.72, 64017.46, 63782.56, 63793.39, 64022.59],
+    "t": [1713207600, 1713211200, 1713214800, 1713218400, 1713222000, 1713225600, 1713229200, 1713232800, 1713236400, 1713240000, 1713243600, 1713247200, 1713250800, 1713254400, 1713258000, 1713261600, 1713265200, 1713268800, 1713272400, 1713276000, 1713279600, 1713283200, 1713286800, 1713290400, 1713294000, 1713297600, 1713301200, 1713304800, 1713308400, 1713312000]
   }
 };
 },{}],"graphing.js":[function(require,module,exports) {
@@ -160,7 +160,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.graphing = graphing;
 var _utils = require("./utils");
-var _flDataTest = _interopRequireDefault(require("./fl-data-test.json"));
+var _flDataTest = _interopRequireDefault(require("./fl-data-test1.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -169,8 +169,8 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 from "./fl-data-test3.json" //1 свечa
 //import data1 from "./fl-data-test2.json" //2 свечи
-// 10 свечей
-//import data1 from "./fl-data-test1.json" //30 свечей
+//import data1 from "./fl-data-test.json" // 10 свечей
+//30 свечей
 //import data1 from "./fl-data-test4.json" //50 свечей
 //import data1 from "./fl-data.json"  // 1001 свеча
 
@@ -194,6 +194,7 @@ function graphing(canvas) {
   var step = Math.round(xWidth / LENGTH);
   var padding = Math.round(step / 4);
   var widthCandle = 2 * padding;
+  var copiedData = structuredClone(_flDataTest.default);
   var raf;
   var proxy = new Proxy({}, {
     set: function set() {
@@ -207,9 +208,9 @@ function graphing(canvas) {
   document.addEventListener("wheel", function (e) {
     e.preventDefault();
     if (e.deltaY < 0) {
-      proxy.scroll += 10;
+      proxy.scroll = 10;
     } else {
-      proxy.scroll -= 10;
+      proxy.scroll = -10;
     }
   }, {
     passive: false
@@ -251,15 +252,58 @@ function graphing(canvas) {
   function clear() {
     ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT);
   }
+  function deleteLast(datad) {
+    datad.data.o.pop();
+    datad.data.h.pop();
+    datad.data.l.pop();
+    datad.data.c.pop();
+    datad.data.t.pop();
+  }
+  function deleteFirst(datad) {
+    datad.data.o.shift();
+    datad.data.h.shift();
+    datad.data.l.shift();
+    datad.data.c.shift();
+    datad.data.t.shift();
+  }
+  function addLast(datad, index) {
+    datad.data.o.push(_flDataTest.default.data.o[index]);
+    datad.data.h.push(_flDataTest.default.data.h[index]);
+    datad.data.l.push(_flDataTest.default.data.l[index]);
+    datad.data.c.push(_flDataTest.default.data.c[index]);
+    datad.data.t.push(_flDataTest.default.data.t[index]);
+  }
+  function addFirst(datad, index) {
+    datad.data.o.unshift(_flDataTest.default.data.o[index]);
+    datad.data.h.unshift(_flDataTest.default.data.h[index]);
+    datad.data.l.unshift(_flDataTest.default.data.l[index]);
+    datad.data.c.unshift(_flDataTest.default.data.c[index]);
+    datad.data.t.unshift(_flDataTest.default.data.t[index]);
+  }
+  function getNewDate(datad, scroll, index) {
+    if (scroll === 10) {
+      if (datad.data.o[index + 1] !== undefined) {
+        deleteLast(datad);
+      }
+      if (datad.data.o[index - 1] !== undefined) {
+        deleteFirst(datad);
+      }
+    }
+    if (scroll === -10) {
+      var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
+      var indexd2 = _flDataTest.default.data.o.indexOf(datad.data.o[0]);
+      if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
+        addLast(datad, indexd1 + 1);
+      }
+      if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
+        addFirst(datad, indexd2 - 1);
+      }
+    }
+  }
   function paint() {
     clear();
-    if (proxy.scroll > 100) proxy.scroll = 100;
-    if (proxy.scroll < 0) proxy.scroll = 0;
     var pos = Math.trunc((curPos * 2 - paddingY) / step);
-    var copiedData = structuredClone(_flDataTest.default);
-    compareDate(copiedData, pos, LENGTH, proxy.scroll);
-    //console.log(copiedData.data)
-    console.log(proxy.scroll);
+    getNewDate(copiedData, proxy.scroll, pos);
     var newLength = copiedData.data.o.length;
     step = Math.round(xWidth / newLength);
     padding = Math.round(step / 4);
@@ -335,10 +379,8 @@ function graphing(canvas) {
       }
     }
   }
-
-  //paint()
 }
-},{"./utils":"utils.js","./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
+},{"./utils":"utils.js","./fl-data-test1.json":"fl-data-test1.json"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 var _graphing = require("./graphing.js");
@@ -368,7 +410,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63506" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55601" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
