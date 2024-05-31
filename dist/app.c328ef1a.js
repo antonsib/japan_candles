@@ -187,15 +187,10 @@ function graphing(canvas) {
   canvas.style.height = HEIGHT + 'px';
   canvas.width = DPI_WIDTH;
   canvas.height = DPI_HEIGHT;
-  var LENGTH = _flDataTest.default.data.o.length;
-  var _findMinMax = (0, _utils.findMinMax)(_flDataTest.default),
-    _findMinMax2 = _slicedToArray(_findMinMax, 2),
-    yMin = _findMinMax2[0],
-    yMax = _findMinMax2[1];
-  var yKof = (yMax - yMin) / VIEW_HEIGHT;
-  var yStep = Math.round((yMax - yMin) / ROWS_COUNT);
   var paddingY = 80;
   var xWidth = DPI_WIDTH - paddingY;
+  var LENGTH = _flDataTest.default.data.o.length;
+  var curPos = 0;
   var step = Math.round(xWidth / LENGTH);
   var padding = Math.round(step / 4);
   var widthCandle = 2 * padding;
@@ -203,13 +198,12 @@ function graphing(canvas) {
   var proxy = new Proxy({}, {
     set: function set() {
       var result = Reflect.set.apply(Reflect, arguments);
-      //raf = requestAnimationFrame(paint) //перерисовка
       raf = requestAnimationFrame(paint);
       return result;
     }
   });
   proxy.scroll = 0;
-  proxy.pos = 0;
+  proxy.pr = 10;
   document.addEventListener("wheel", function (e) {
     e.preventDefault();
     if (e.deltaY < 0) {
@@ -222,11 +216,7 @@ function graphing(canvas) {
   });
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
     var x = event.clientX; // получаем координату X мыши
-    var y = event.clientY; // получаем координату Y мыши
-    // console.log(`Координаты мыши: x=${x}, y=${y}`); // выводим координаты мыши в консоль
-    var pos = Math.trunc((x * 2 - paddingY) / step) + 1;
-    proxy.pos = pos;
-    //console.log(pos)
+    curPos = x;
   });
   function filterDate(datad, index1, index2) {
     datad.data.o = datad.data.o.slice(index1, index2);
@@ -237,29 +227,24 @@ function graphing(canvas) {
     return datad;
   }
   function compareDate(datad, index, length, pr) {
-    if (pr >= 0 && pr <= 100) {
-      var len1 = index + 1;
-      var len2 = length - index;
+    //verno
+    if (function (pr) {
+      return 0 && pr <= 100;
+    }) {
+      var len1 = index;
+      var len2 = length - index - 1;
       var len1_1 = Math.round(len1 - pr * len1 / 100);
       var len2_1 = Math.round(len2 - pr * len2 / 100);
-      var index1 = index - len1_1 + 1;
+      var index1 = index - len1_1;
       var index2 = index + len2_1;
-
-      //console.log(index1,index2)
-
       if (index2 === index1 + 1) {
-        //b= data.data.o.slice(index1,index2+1)
         var res = filterDate(datad, index1, index2 + 1);
       } else if (index2 === index1) {
-        //b=data.data.o.slice(index1,index2+1)
         var _res = filterDate(datad, index1, index2 + 1);
-        // return res
       } else if (index2 < index1) {
-        //b=data.data.o.slice(index2,index1)
-        var _res2 = filterDate(datad, index2, index1);
+        var _res2 = filterDate(datad, index2, index1 + 1);
       } else {
-        //b = data.data.o.slice(index1,index2)
-        var _res3 = filterDate(datad, index1, index2);
+        var _res3 = filterDate(datad, index1, index2 + 1);
       }
     }
   }
@@ -270,14 +255,26 @@ function graphing(canvas) {
     clear();
     if (proxy.scroll > 100) proxy.scroll = 100;
     if (proxy.scroll < 0) proxy.scroll = 0;
+    var pos = Math.trunc((curPos * 2 - paddingY) / step);
     var copiedData = structuredClone(_flDataTest.default);
-    compareDate(copiedData, proxy.pos - 1, _flDataTest.default.data.o.length, proxy.scroll);
-    console.log(copiedData.data);
-    drawX();
-    drawY();
-    draw();
+    compareDate(copiedData, pos, LENGTH, proxy.scroll);
+    //console.log(copiedData.data)
+    console.log(proxy.scroll);
+    var newLength = copiedData.data.o.length;
+    step = Math.round(xWidth / newLength);
+    padding = Math.round(step / 4);
+    widthCandle = 2 * padding;
+    var _findMinMax = (0, _utils.findMinMax)(copiedData),
+      _findMinMax2 = _slicedToArray(_findMinMax, 2),
+      yMin = _findMinMax2[0],
+      yMax = _findMinMax2[1];
+    var yKof = (yMax - yMin) / VIEW_HEIGHT;
+    var yStep = Math.round((yMax - yMin) / ROWS_COUNT);
+    drawX(copiedData, newLength);
+    drawY(yMin, yStep);
+    draw(copiedData, newLength, yKof, yMin);
   }
-  function drawY() {
+  function drawY(yMin, yStep) {
     var step = VIEW_HEIGHT / ROWS_COUNT;
     ctx.beginPath();
     ctx.lineWidth = 2;
@@ -291,53 +288,55 @@ function graphing(canvas) {
     ctx.stroke();
     ctx.closePath();
   }
-  function drawX() {
-    var stepValue = (LENGTH / ROWS_COUNT).toFixed();
+  function drawX(copiedData, newLength) {
+    var stepValue = (newLength / ROWS_COUNT).toFixed();
     if (stepValue == 0) stepValue = 1;
     ctx.beginPath();
     ctx.font = 'normal 20px Helvetica, sans-serif';
     ctx.fillStyle = '#96a2aa';
-    for (var i = 0, j = 1; i < LENGTH; i++, j += 2) {
+    for (var i = 0, j = 1; i < newLength; i++, j += 2) {
       if ((i - 1) % stepValue === 0) {
         ctx.moveTo(paddingY + widthCandle * j - padding, DPI_HEIGHT - PADDING);
-        var time = new Date(_flDataTest.default.data.t[i] * 1000);
+        var time = new Date(copiedData.data.t[i] * 1000);
         ctx.fillText((0, _utils.toDate)(time), paddingY + j * widthCandle, DPI_HEIGHT - PADDING);
       }
     }
     ctx.stroke();
     ctx.closePath();
   }
-  function draw() {
-    for (var i = 0, j = 1; i < LENGTH; i++, j += 2) {
-      if (_flDataTest.default.data.o[i] <= _flDataTest.default.data.c[i]) {
+  function draw(copiedData, newLength, yKof, yMin) {
+    for (var i = 0, j = 1; i < newLength; i++, j += 2) {
+      if (copiedData.data.o[i] <= copiedData.data.c[i]) {
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = "green";
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.l[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.o[i] - yMin) / yKof);
-        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (_flDataTest.default.data.c[i] - yMin) / yKof, padding * 2, (_flDataTest.default.data.c[i] - _flDataTest.default.data.o[i]) / yKof);
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.l[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof);
+        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof, padding * 2, (copiedData.data.c[i] - copiedData.data.o[i]) / yKof);
         ctx.fillStyle = 'green';
         ctx.fill();
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.c[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.h[i] - yMin) / yKof);
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.h[i] - yMin) / yKof);
         ctx.stroke();
         ctx.closePath();
-      } else if (_flDataTest.default.data.o[i] > _flDataTest.default.data.c[i]) {
+      } else if (copiedData.data.o[i] > copiedData.data.c[i]) {
         ctx.beginPath();
         ctx.lineWidth = 2;
         ctx.strokeStyle = "red";
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.l[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.c[i] - yMin) / yKof);
-        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (_flDataTest.default.data.o[i] - yMin) / yKof, padding * 2, (_flDataTest.default.data.o[i] - _flDataTest.default.data.c[i]) / yKof);
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.l[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof);
+        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof, padding * 2, (copiedData.data.o[i] - copiedData.data.c[i]) / yKof);
         ctx.fillStyle = 'red';
         ctx.fill();
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.o[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (_flDataTest.default.data.h[i] - yMin) / yKof);
+        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof);
+        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.h[i] - yMin) / yKof);
         ctx.stroke();
         ctx.closePath();
       }
     }
   }
+
+  //paint()
 }
 },{"./utils":"utils.js","./fl-data-test.json":"fl-data-test.json"}],"app.js":[function(require,module,exports) {
 "use strict";
@@ -369,7 +368,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49811" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63506" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

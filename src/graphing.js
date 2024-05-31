@@ -21,31 +21,31 @@ export function graphing (canvas){
     canvas.style.height = HEIGHT + 'px'
      canvas.width = DPI_WIDTH
      canvas.height = DPI_HEIGHT
-  
-  const LENGTH = data1.data.o.length   
-   const [yMin, yMax] =  findMinMax(data1)
-   const yKof = ((yMax - yMin) / VIEW_HEIGHT)
-   const yStep = Math.round(((yMax - yMin) / ROWS_COUNT))
-   
-   const paddingY = 80
-   const xWidth = DPI_WIDTH - paddingY
-   const step = Math.round((xWidth/LENGTH))
-   const padding = Math.round((step / 4))
-   const widthCandle = 2 * padding
+     const paddingY = 80
+     const xWidth = DPI_WIDTH - paddingY
+     let LENGTH = data1.data.o.length 
+     let curPos = 0  
+     
+     let step = Math.round((xWidth/LENGTH))
+     let padding = Math.round((step / 4))
+     let widthCandle = 2 * padding
+     
    let raf
-
-    const proxy = new Proxy({}, {
+   
+   
+  const proxy = new Proxy({}, {
     set(...arg){
        const result= Reflect.set(...arg)
-       //raf = requestAnimationFrame(paint) //перерисовка
        raf = requestAnimationFrame(paint)
        return result
     },
   })
-
+ 
+ 
    
   proxy.scroll = 0
-  proxy.pos = 0
+  proxy.pr = 10
+  
  
     document.addEventListener("wheel",function(e){
     e.preventDefault();
@@ -57,57 +57,45 @@ export function graphing (canvas){
     } 
     },{passive: false})
    
-   
-
-    
+       
    document.getElementById("canvas").addEventListener("mousemove", function (event) {
     const x = event.clientX; // получаем координату X мыши
-    const y = event.clientY; // получаем координату Y мыши
-   // console.log(`Координаты мыши: x=${x}, y=${y}`); // выводим координаты мыши в консоль
-    const pos = Math.trunc(((x * 2 - paddingY)/step)) + 1
-    proxy.pos = pos
-    //console.log(pos)
+    curPos = x 
     })
     
-    function filterDate(datad,index1,index2){
+    function filterDate(datad,index1,index2){  
       datad.data.o = datad.data.o.slice(index1,index2)
       datad.data.h = datad.data.h.slice(index1,index2)
       datad.data.l = datad.data.l.slice(index1,index2)
       datad.data.c = datad.data.c.slice(index1,index2)
       datad.data.t = datad.data.t.slice(index1,index2)
+      
       return datad
     }
+        
+    function compareDate(datad,index, length ,pr ){  //verno
+      if(pr => 0 && pr <= 100){
   
-    
-    function compareDate(datad,index, length ,pr ){
-      if(pr >= 0 && pr <= 100){
-          let len1 = index  + 1
-          let len2 = length - index 
+          let len1 = index  
+          let len2 = length - index -1
         
           let len1_1 = Math.round(len1 - (pr * len1)/100)
           let len2_1 = Math.round(len2 - (pr * len2)/100)
         
-          let index1 = index - len1_1 + 1
+          let index1 = index - len1_1 
           let index2 = index + len2_1 
           
-          //console.log(index1,index2)
-          
           if(index2 === index1+1){
-             //b= data.data.o.slice(index1,index2+1)
              const res = filterDate(datad,index1,index2+1)
           }
           else if (index2===index1){
-            //b=data.data.o.slice(index1,index2+1)
             const res = filterDate(datad,index1,index2+1)
-           // return res
           }
           else if (index2 < index1){
-              //b=data.data.o.slice(index2,index1)
-              const res = filterDate(datad,index2,index1)
+              const res = filterDate(datad,index2,index1+1)
           }
           else {
-              //b = data.data.o.slice(index1,index2)
-              const res = filterDate(datad,index1,index2)
+              const res = filterDate(datad,index1,index2+1)
           }
           
        }
@@ -116,54 +104,38 @@ export function graphing (canvas){
   function clear(){
       ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT)
   }
-
+  
   function paint(){
     clear()
-    
     if(proxy.scroll > 100 ) proxy.scroll = 100
-      if (proxy.scroll < 0) proxy.scroll = 0
+    if (proxy.scroll < 0) proxy.scroll = 0
+
+    
+    const pos = Math.trunc(((curPos * 2 - paddingY)/step))
+
     const copiedData = structuredClone(data1)
-    compareDate(copiedData, proxy.pos -1, data1.data.o.length, proxy.scroll)
+    compareDate(copiedData, pos, LENGTH, proxy.scroll)
+    //console.log(copiedData.data)
+    console.log(proxy.scroll)
+  
+    const newLength = copiedData.data.o.length
 
+    step = Math.round((xWidth/newLength))
+    padding = Math.round((step / 4))
+    widthCandle = 2 * padding
+
+    const [yMin, yMax] =  findMinMax(copiedData)
+    const yKof = ((yMax - yMin) / VIEW_HEIGHT)
+    const yStep = Math.round(((yMax - yMin) / ROWS_COUNT))
     
-
-    console.log(copiedData.data)
- 
-
     
-    drawX()
-    drawY()
-    draw()
+    drawX(copiedData, newLength )
+    drawY(yMin, yStep)
+    draw(copiedData, newLength,yKof, yMin)
     }
    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   function drawY(){
+   function drawY(yMin, yStep){
       const step = VIEW_HEIGHT / ROWS_COUNT
       ctx.beginPath()
       ctx.lineWidth = 2
@@ -178,16 +150,16 @@ export function graphing (canvas){
       ctx.closePath()
     }
    
-   function drawX(){
-    let stepValue = (LENGTH / ROWS_COUNT).toFixed() 
+   function drawX(copiedData, newLength){
+    let stepValue = (newLength / ROWS_COUNT).toFixed() 
     if(stepValue == 0) stepValue = 1
     ctx.beginPath()
     ctx.font = 'normal 20px Helvetica, sans-serif'
     ctx.fillStyle = '#96a2aa'
-    for (let i = 0, j = 1; i < LENGTH; i++, j += 2){
+    for (let i = 0, j = 1; i < newLength; i++, j += 2){
        if((i-1) % stepValue === 0){
         ctx.moveTo( paddingY +  widthCandle * j  - padding, DPI_HEIGHT - PADDING)
-        const time = new Date(data1.data.t[i] * 1000)
+        const time = new Date(copiedData.data.t[i] * 1000)
         ctx.fillText( toDate(time), paddingY + j * widthCandle , DPI_HEIGHT - PADDING)
        }
     }
@@ -195,45 +167,47 @@ export function graphing (canvas){
     ctx.closePath()
    }
 
-    function draw(){
-      for (let i = 0, j=1 ; i < LENGTH; i++ , j+=2){
-        if(data1.data.o[i] <= data1.data.c[i]) {
+    function draw(copiedData,newLength,yKof, yMin){
+      for (let i = 0, j=1 ; i < newLength; i++ , j+=2){
+        if(copiedData.data.o[i] <= copiedData.data.c[i]) {
           ctx.beginPath()
           ctx.lineWidth = 2
           ctx.strokeStyle= "green"
-          ctx.moveTo( paddingY + j * widthCandle , VIEW_HEIGHT - ((data1.data.l[i] - yMin)/yKof))
-          ctx.lineTo( paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.o[i] - yMin)/yKof))
+          ctx.moveTo( paddingY + j * widthCandle , VIEW_HEIGHT - ((copiedData.data.l[i] - yMin)/yKof))
+          ctx.lineTo( paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.o[i] - yMin)/yKof))
           
-          ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - ((data1.data.c[i] - yMin)/yKof), padding * 2, 
-          (data1.data.c[i] - data1.data.o[i]) / yKof)
+          ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - ((copiedData.data.c[i] - yMin)/yKof), padding * 2, 
+          (copiedData.data.c[i] - copiedData.data.o[i]) / yKof)
           ctx.fillStyle = 'green'
           ctx.fill()
           
-          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.c[i] - yMin)/yKof))
-          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.h[i] - yMin)/yKof))
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.c[i] - yMin)/yKof))
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.h[i] - yMin)/yKof))
            
           ctx.stroke()
           ctx.closePath()
           
         }
-        else if(data1.data.o[i] > data1.data.c[i]){    
+        else if(copiedData.data.o[i] > copiedData.data.c[i]){    
           ctx.beginPath()
           ctx.lineWidth = 2
           ctx.strokeStyle= "red" 
-          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.l[i] - yMin)/yKof))
-          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.c[i] - yMin)/yKof))
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.l[i] - yMin)/yKof))
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.c[i] - yMin)/yKof))
 
-          ctx.rect(paddingY + j * widthCandle - padding,  VIEW_HEIGHT - ((data1.data.o[i] - yMin)/yKof), padding * 2, 
-          (data1.data.o[i] - data1.data.c[i]) / yKof)
+          ctx.rect(paddingY + j * widthCandle - padding,  VIEW_HEIGHT - ((copiedData.data.o[i] - yMin)/yKof), padding * 2, 
+          (copiedData.data.o[i] - copiedData.data.c[i]) / yKof)
           ctx.fillStyle = 'red'
           ctx.fill()
 
-          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.o[i] - yMin)/yKof))
-          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((data1.data.h[i] - yMin)/yKof))
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.o[i] - yMin)/yKof))
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - ((copiedData.data.h[i] - yMin)/yKof))
 
           ctx.stroke()
           ctx.closePath()
         }
       }
     }
+
+    //paint()
 }
