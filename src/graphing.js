@@ -4,7 +4,9 @@ import { findMinMax, toDate } from "./utils"
 //import data1 from "./fl-data-test.json" // 10 свечей
 import data1 from "./fl-data-test1.json" //30 свечей
 //import data1 from "./fl-data-test4.json" //50 свечей
-//import data1 from "./fl-data.json"  // 1001 свеча
+//import data1 from "./fl-data-test5.json" //2 свечи и одна пустая
+//import data1 from "./fl-data-test6.json" //3
+//import data1 from "./fl-data.json"  // 1001 свеча0
 
 const WIDTH = 1300 
 const HEIGHT = 450
@@ -30,7 +32,8 @@ export function graphing (canvas){
      let padding = Math.round((step / 4))
      let widthCandle = 2 * padding
      const copiedData = structuredClone(data1)
-   let raf
+     let raf
+     let action 
    
    
   const proxy = new Proxy({}, {
@@ -42,35 +45,50 @@ export function graphing (canvas){
   })
  
   proxy.scroll = 0
-  proxy.pr = 10
   
  
     document.addEventListener("wheel",function(e){
     e.preventDefault();
     if(e.deltaY < 0) {
        proxy.scroll = 10
+       action = "scroll"
       }
     else{
       proxy.scroll = -10
+      action = "scroll"
     } 
     },{passive: false})
    
        
    document.getElementById("canvas").addEventListener("mousemove", function (event) {
-    const x = event.clientX; // получаем координату X мыши
+    const x = event.clientX; 
     curPos = x 
     })
+
+    document.getElementById("zoomUp").addEventListener("click", function (e) {
+      curPos = DPI_HEIGHT / 2 
+      proxy.scroll = 10
+      action = "scroll"
+    })
     
-    function filterDate(datad,index1,index2){  
-      datad.data.o = datad.data.o.slice(index1,index2)
-      datad.data.h = datad.data.h.slice(index1,index2)
-      datad.data.l = datad.data.l.slice(index1,index2)
-      datad.data.c = datad.data.c.slice(index1,index2)
-      datad.data.t = datad.data.t.slice(index1,index2)
-      
-      return datad
-    }
-         
+    document.getElementById("zoomDown").addEventListener("click", function (e) {
+      curPos = DPI_HEIGHT / 2 
+      proxy.scroll = -10
+      action = "scroll"
+    })
+
+    document.getElementById("buttonRight").addEventListener("click", function (e) {
+      curPos = DPI_HEIGHT / 2 
+      action = "right"
+      proxy.action = "right"
+    })
+
+    document.getElementById("buttonLeft").addEventListener("click", function (e) {
+      curPos = DPI_HEIGHT / 2 
+      action = "left"
+      proxy.action = "left"
+    })
+           
   function clear(){
       ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT)
   }
@@ -91,40 +109,84 @@ export function graphing (canvas){
     datad.data.t.shift()
   }
   
-  function addLast(datad, index){
-    datad.data.o.push(data1.data.o[index])
-    datad.data.h.push(data1.data.h[index])
-    datad.data.l.push(data1.data.l[index])
-    datad.data.c.push(data1.data.c[index])
-    datad.data.t.push(data1.data.t[index])
+  function addLast(datad, index, isNum){
+    if(isNum === true){
+      datad.data.o.push(data1.data.o[index])
+      datad.data.h.push(data1.data.h[index])
+      datad.data.l.push(data1.data.l[index])
+      datad.data.c.push(data1.data.c[index])
+      datad.data.t.push(data1.data.t[index])
+    }
+    else if (isNum === false){
+      datad.data.o.push(0)
+      datad.data.h.push(0)
+      datad.data.l.push(0)
+      datad.data.c.push(0)
+      datad.data.t.push(0)
+    }
   }
 
-  function addFirst(datad, index){
-    datad.data.o.unshift(data1.data.o[index])
-    datad.data.h.unshift(data1.data.h[index])
-    datad.data.l.unshift(data1.data.l[index])
-    datad.data.c.unshift(data1.data.c[index])
-    datad.data.t.unshift(data1.data.t[index])
+  function addFirst(datad, index, isNum){
+    if(isNum === true){
+      datad.data.o.unshift(data1.data.o[index])
+      datad.data.h.unshift(data1.data.h[index])
+      datad.data.l.unshift(data1.data.l[index])
+      datad.data.c.unshift(data1.data.c[index])
+      datad.data.t.unshift(data1.data.t[index])
+    }
+    else if (isNum === false){
+      datad.data.o.unshift(0)
+      datad.data.h.unshift(0)
+      datad.data.l.unshift(0)
+      datad.data.c.unshift(0)
+      datad.data.t.unshift(0)
+    } 
   }
 
   function getNewDate(datad, scroll, index){
-    if (scroll === 10 ) {
+    let indexd1 = data1.data.o.indexOf(datad.data.o[datad.data.o.length - 1]) 
+    let indexd2 = data1.data.o.indexOf(datad.data.o[0]) 
+    if(action === "scroll" ){
+      if (scroll === 10 ) {
          if (datad.data.o[index +1] !== undefined){
             deleteLast(datad)
          }
          if (datad.data.o[index -1 ]!== undefined){
              deleteFirst(datad)
          }
+      }
+      else if (scroll === -10 ){
+        if (data1.data.o[indexd1 +1 ] !== undefined){
+          addLast(datad, indexd1 +1 , true )
+        }
+        if (data1.data.o[indexd2 -1 ]!== undefined){
+          addFirst(datad, indexd2-1, true )
+        }
+      }
     }
-    if (scroll === -10){
-      let indexd1 = data1.data.o.indexOf(datad.data.o[datad.data.o.length - 1])
-      let indexd2 = data1.data.o.indexOf(datad.data.o[0])
-      if (data1.data.o[indexd1 +1 ] !== undefined){
-        addLast(datad, indexd1 +1 )
-     }
-     if (data1.data.o[indexd2 -1 ]!== undefined){
-      addFirst(datad, indexd2-1 )
-     }
+    else if(action === "right"){
+        deleteFirst(datad)
+      if (indexd1 !== -1){
+        if (data1.data.o[indexd1 +1 ] !== undefined){
+          addLast(datad, indexd1 +1 , true )
+        }
+        else if (data1.data.o[indexd1 +1 ] === undefined){
+           addLast(datad, indexd1 +1 , false )
+        }
+      }
+      else if (indexd1 === -1 ) addLast(datad, indexd1 +1 , false )
+    }
+    else if (action === "left"){
+      deleteLast(datad)
+      if (indexd2 !== -1){
+        if (data1.data.o[indexd2 - 1 ] !== undefined){
+          addFirst(datad, indexd2 -1 , true )
+        }
+        else if (data1.data.o[indexd2 - 1 ] === undefined){
+           addFirst(datad, indexd2 -1 , false )
+        }
+      }
+      else if (indexd2 === -1 ) addFirst(datad, indexd2 - 1 , false )
     }
   }
 
@@ -143,7 +205,8 @@ export function graphing (canvas){
     const [yMin, yMax] =  findMinMax(copiedData)
     const yKof = ((yMax - yMin) / VIEW_HEIGHT)
     const yStep = Math.round(((yMax - yMin) / ROWS_COUNT))
-  
+    
+    //console.log(copiedData)
     drawX(copiedData, newLength )
     drawY(yMin, yStep)
     draw(copiedData, newLength,yKof, yMin)
@@ -172,7 +235,7 @@ export function graphing (canvas){
     ctx.font = 'normal 20px Helvetica, sans-serif'
     ctx.fillStyle = '#96a2aa'
     for (let i = 0, j = 1; i < newLength; i++, j += 2){
-       if((i-1) % stepValue === 0){
+       if((i-1) % stepValue === 0 && copiedData.data.t[i] !== 0 ){
         ctx.moveTo( paddingY +  widthCandle * j  - padding, DPI_HEIGHT - PADDING)
         const time = new Date(copiedData.data.t[i] * 1000)
         ctx.fillText( toDate(time), paddingY + j * widthCandle , DPI_HEIGHT - PADDING)
@@ -184,6 +247,7 @@ export function graphing (canvas){
 
     function draw(copiedData,newLength,yKof, yMin){
       for (let i = 0, j=1 ; i < newLength; i++ , j+=2){
+        if(copiedData.data.o[i] !== 0){
         if(copiedData.data.o[i] <= copiedData.data.c[i]) {
           ctx.beginPath()
           ctx.lineWidth = 2
@@ -223,5 +287,6 @@ export function graphing (canvas){
         }
       }
     }
+  }
 
 }

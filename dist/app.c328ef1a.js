@@ -125,15 +125,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.findMinMax = findMinMax;
 exports.toDate = toDate;
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function findMinMax(data) {
-  var min = Math.min.apply(Math, _toConsumableArray(data.data.l));
-  var max = Math.max.apply(Math, _toConsumableArray(data.data.h));
+  //let min = Math.min(...data.data.l)
+  // let max = Math.max(...data.data.h)
+
+  var min = 1000000;
+  var max = -1;
+  for (var i = 0; i < data.data.h.length; i++) {
+    if (data.data.l[i] !== 0) {
+      if (max < data.data.h[i]) max = data.data.h[i];
+      if (min > data.data.l[i]) min = data.data.l[i];
+    }
+  }
   return [min, max];
 }
 function toDate(timestamp) {
@@ -172,7 +175,9 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 f
 //import data1 from "./fl-data-test.json" // 10 свечей
 //30 свечей
 //import data1 from "./fl-data-test4.json" //50 свечей
-//import data1 from "./fl-data.json"  // 1001 свеча
+//import data1 from "./fl-data-test5.json" //2 свечи и одна пустая
+//import data1 from "./fl-data-test6.json" //3
+//import data1 from "./fl-data.json"  // 1001 свеча0
 
 var WIDTH = 1300;
 var HEIGHT = 450;
@@ -196,6 +201,7 @@ function graphing(canvas) {
   var widthCandle = 2 * padding;
   var copiedData = structuredClone(_flDataTest.default);
   var raf;
+  var action;
   var proxy = new Proxy({}, {
     set: function set() {
       var result = Reflect.set.apply(Reflect, arguments);
@@ -204,51 +210,42 @@ function graphing(canvas) {
     }
   });
   proxy.scroll = 0;
-  proxy.pr = 10;
   document.addEventListener("wheel", function (e) {
     e.preventDefault();
     if (e.deltaY < 0) {
       proxy.scroll = 10;
+      action = "scroll";
     } else {
       proxy.scroll = -10;
+      action = "scroll";
     }
   }, {
     passive: false
   });
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
-    var x = event.clientX; // получаем координату X мыши
+    var x = event.clientX;
     curPos = x;
   });
-  function filterDate(datad, index1, index2) {
-    datad.data.o = datad.data.o.slice(index1, index2);
-    datad.data.h = datad.data.h.slice(index1, index2);
-    datad.data.l = datad.data.l.slice(index1, index2);
-    datad.data.c = datad.data.c.slice(index1, index2);
-    datad.data.t = datad.data.t.slice(index1, index2);
-    return datad;
-  }
-  function compareDate(datad, index, length, pr) {
-    //verno
-    if (function (pr) {
-      return 0 && pr <= 100;
-    }) {
-      var len1 = index;
-      var len2 = length - index - 1;
-      var len1_1 = Math.round(len1 - pr * len1 / 100);
-      var len2_1 = Math.round(len2 - pr * len2 / 100);
-      var index1 = index - len1_1;
-      var index2 = index + len2_1;
-      if (index2 === index1 + 1) {
-        var res = filterDate(datad, index1, index2 + 1);
-      } else if (index2 === index1) {
-        var _res = filterDate(datad, index1, index2 + 1);
-      } else if (index2 < index1) {
-        var _res2 = filterDate(datad, index2, index1 + 1);
-      } else {
-        var _res3 = filterDate(datad, index1, index2 + 1);
-      }
-    }
-  }
+  document.getElementById("zoomUp").addEventListener("click", function (e) {
+    curPos = DPI_HEIGHT / 2;
+    proxy.scroll = 10;
+    action = "scroll";
+  });
+  document.getElementById("zoomDown").addEventListener("click", function (e) {
+    curPos = DPI_HEIGHT / 2;
+    proxy.scroll = -10;
+    action = "scroll";
+  });
+  document.getElementById("buttonRight").addEventListener("click", function (e) {
+    curPos = DPI_HEIGHT / 2;
+    action = "right";
+    proxy.action = "right";
+  });
+  document.getElementById("buttonLeft").addEventListener("click", function (e) {
+    curPos = DPI_HEIGHT / 2;
+    action = "left";
+    proxy.action = "left";
+  });
   function clear() {
     ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT);
   }
@@ -266,38 +263,73 @@ function graphing(canvas) {
     datad.data.c.shift();
     datad.data.t.shift();
   }
-  function addLast(datad, index) {
-    datad.data.o.push(_flDataTest.default.data.o[index]);
-    datad.data.h.push(_flDataTest.default.data.h[index]);
-    datad.data.l.push(_flDataTest.default.data.l[index]);
-    datad.data.c.push(_flDataTest.default.data.c[index]);
-    datad.data.t.push(_flDataTest.default.data.t[index]);
+  function addLast(datad, index, isNum) {
+    if (isNum === true) {
+      datad.data.o.push(_flDataTest.default.data.o[index]);
+      datad.data.h.push(_flDataTest.default.data.h[index]);
+      datad.data.l.push(_flDataTest.default.data.l[index]);
+      datad.data.c.push(_flDataTest.default.data.c[index]);
+      datad.data.t.push(_flDataTest.default.data.t[index]);
+    } else if (isNum === false) {
+      datad.data.o.push(0);
+      datad.data.h.push(0);
+      datad.data.l.push(0);
+      datad.data.c.push(0);
+      datad.data.t.push(0);
+    }
   }
-  function addFirst(datad, index) {
-    datad.data.o.unshift(_flDataTest.default.data.o[index]);
-    datad.data.h.unshift(_flDataTest.default.data.h[index]);
-    datad.data.l.unshift(_flDataTest.default.data.l[index]);
-    datad.data.c.unshift(_flDataTest.default.data.c[index]);
-    datad.data.t.unshift(_flDataTest.default.data.t[index]);
+  function addFirst(datad, index, isNum) {
+    if (isNum === true) {
+      datad.data.o.unshift(_flDataTest.default.data.o[index]);
+      datad.data.h.unshift(_flDataTest.default.data.h[index]);
+      datad.data.l.unshift(_flDataTest.default.data.l[index]);
+      datad.data.c.unshift(_flDataTest.default.data.c[index]);
+      datad.data.t.unshift(_flDataTest.default.data.t[index]);
+    } else if (isNum === false) {
+      datad.data.o.unshift(0);
+      datad.data.h.unshift(0);
+      datad.data.l.unshift(0);
+      datad.data.c.unshift(0);
+      datad.data.t.unshift(0);
+    }
   }
   function getNewDate(datad, scroll, index) {
-    if (scroll === 10) {
-      if (datad.data.o[index + 1] !== undefined) {
-        deleteLast(datad);
+    var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
+    var indexd2 = _flDataTest.default.data.o.indexOf(datad.data.o[0]);
+    if (action === "scroll") {
+      if (scroll === 10) {
+        if (datad.data.o[index + 1] !== undefined) {
+          deleteLast(datad);
+        }
+        if (datad.data.o[index - 1] !== undefined) {
+          deleteFirst(datad);
+        }
+      } else if (scroll === -10) {
+        if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
+          addLast(datad, indexd1 + 1, true);
+        }
+        if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
+          addFirst(datad, indexd2 - 1, true);
+        }
       }
-      if (datad.data.o[index - 1] !== undefined) {
-        deleteFirst(datad);
-      }
-    }
-    if (scroll === -10) {
-      var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
-      var indexd2 = _flDataTest.default.data.o.indexOf(datad.data.o[0]);
-      if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
-        addLast(datad, indexd1 + 1);
-      }
-      if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
-        addFirst(datad, indexd2 - 1);
-      }
+    } else if (action === "right") {
+      deleteFirst(datad);
+      if (indexd1 !== -1) {
+        if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
+          addLast(datad, indexd1 + 1, true);
+        } else if (_flDataTest.default.data.o[indexd1 + 1] === undefined) {
+          addLast(datad, indexd1 + 1, false);
+        }
+      } else if (indexd1 === -1) addLast(datad, indexd1 + 1, false);
+    } else if (action === "left") {
+      deleteLast(datad);
+      if (indexd2 !== -1) {
+        if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
+          addFirst(datad, indexd2 - 1, true);
+        } else if (_flDataTest.default.data.o[indexd2 - 1] === undefined) {
+          addFirst(datad, indexd2 - 1, false);
+        }
+      } else if (indexd2 === -1) addFirst(datad, indexd2 - 1, false);
     }
   }
   function paint() {
@@ -314,6 +346,8 @@ function graphing(canvas) {
       yMax = _findMinMax2[1];
     var yKof = (yMax - yMin) / VIEW_HEIGHT;
     var yStep = Math.round((yMax - yMin) / ROWS_COUNT);
+
+    //console.log(copiedData)
     drawX(copiedData, newLength);
     drawY(yMin, yStep);
     draw(copiedData, newLength, yKof, yMin);
@@ -339,7 +373,7 @@ function graphing(canvas) {
     ctx.font = 'normal 20px Helvetica, sans-serif';
     ctx.fillStyle = '#96a2aa';
     for (var i = 0, j = 1; i < newLength; i++, j += 2) {
-      if ((i - 1) % stepValue === 0) {
+      if ((i - 1) % stepValue === 0 && copiedData.data.t[i] !== 0) {
         ctx.moveTo(paddingY + widthCandle * j - padding, DPI_HEIGHT - PADDING);
         var time = new Date(copiedData.data.t[i] * 1000);
         ctx.fillText((0, _utils.toDate)(time), paddingY + j * widthCandle, DPI_HEIGHT - PADDING);
@@ -350,42 +384,100 @@ function graphing(canvas) {
   }
   function draw(copiedData, newLength, yKof, yMin) {
     for (var i = 0, j = 1; i < newLength; i++, j += 2) {
-      if (copiedData.data.o[i] <= copiedData.data.c[i]) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "green";
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.l[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof);
-        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof, padding * 2, (copiedData.data.c[i] - copiedData.data.o[i]) / yKof);
-        ctx.fillStyle = 'green';
-        ctx.fill();
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.h[i] - yMin) / yKof);
-        ctx.stroke();
-        ctx.closePath();
-      } else if (copiedData.data.o[i] > copiedData.data.c[i]) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "red";
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.l[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof);
-        ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof, padding * 2, (copiedData.data.o[i] - copiedData.data.c[i]) / yKof);
-        ctx.fillStyle = 'red';
-        ctx.fill();
-        ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof);
-        ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.h[i] - yMin) / yKof);
-        ctx.stroke();
-        ctx.closePath();
+      if (copiedData.data.o[i] !== 0) {
+        if (copiedData.data.o[i] <= copiedData.data.c[i]) {
+          ctx.beginPath();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "green";
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.l[i] - yMin) / yKof);
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof);
+          ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof, padding * 2, (copiedData.data.c[i] - copiedData.data.o[i]) / yKof);
+          ctx.fillStyle = 'green';
+          ctx.fill();
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof);
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.h[i] - yMin) / yKof);
+          ctx.stroke();
+          ctx.closePath();
+        } else if (copiedData.data.o[i] > copiedData.data.c[i]) {
+          ctx.beginPath();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "red";
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.l[i] - yMin) / yKof);
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.c[i] - yMin) / yKof);
+          ctx.rect(paddingY + j * widthCandle - padding, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof, padding * 2, (copiedData.data.o[i] - copiedData.data.c[i]) / yKof);
+          ctx.fillStyle = 'red';
+          ctx.fill();
+          ctx.moveTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.o[i] - yMin) / yKof);
+          ctx.lineTo(paddingY + j * widthCandle, VIEW_HEIGHT - (copiedData.data.h[i] - yMin) / yKof);
+          ctx.stroke();
+          ctx.closePath();
+        }
       }
     }
   }
 }
-},{"./utils":"utils.js","./fl-data-test1.json":"fl-data-test1.json"}],"app.js":[function(require,module,exports) {
+},{"./utils":"utils.js","./fl-data-test1.json":"fl-data-test1.json"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+var bundleURL = null;
+function getBundleURLCached() {
+  if (!bundleURL) {
+    bundleURL = getBundleURL();
+  }
+  return bundleURL;
+}
+function getBundleURL() {
+  // Attempt to find the URL of the current script and use that as the base URL
+  try {
+    throw new Error();
+  } catch (err) {
+    var matches = ('' + err.stack).match(/(https?|file|ftp|chrome-extension|moz-extension):\/\/[^)\n]+/g);
+    if (matches) {
+      return getBaseURL(matches[0]);
+    }
+  }
+  return '/';
+}
+function getBaseURL(url) {
+  return ('' + url).replace(/^((?:https?|file|ftp|chrome-extension|moz-extension):\/\/.+)?\/[^/]+(?:\?.*)?$/, '$1') + '/';
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+},{}],"../node_modules/parcel-bundler/src/builtins/css-loader.js":[function(require,module,exports) {
+var bundle = require('./bundle-url');
+function updateLink(link) {
+  var newLink = link.cloneNode();
+  newLink.onload = function () {
+    link.remove();
+  };
+  newLink.href = link.href.split('?')[0] + '?' + Date.now();
+  link.parentNode.insertBefore(newLink, link.nextSibling);
+}
+var cssTimeout = null;
+function reloadCSS() {
+  if (cssTimeout) {
+    return;
+  }
+  cssTimeout = setTimeout(function () {
+    var links = document.querySelectorAll('link[rel="stylesheet"]');
+    for (var i = 0; i < links.length; i++) {
+      if (bundle.getBaseURL(links[i].href) === bundle.getBundleURL()) {
+        updateLink(links[i]);
+      }
+    }
+    cssTimeout = null;
+  }, 50);
+}
+module.exports = reloadCSS;
+},{"./bundle-url":"../node_modules/parcel-bundler/src/builtins/bundle-url.js"}],"styles.scss":[function(require,module,exports) {
+var reloadCSS = require('_css_loader');
+module.hot.dispose(reloadCSS);
+module.hot.accept(reloadCSS);
+},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"app.js":[function(require,module,exports) {
 "use strict";
 
 var _graphing = require("./graphing.js");
+require("./styles.scss");
 var app = (0, _graphing.graphing)(document.getElementById('canvas'));
-},{"./graphing.js":"graphing.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./graphing.js":"graphing.js","./styles.scss":"styles.scss"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -410,7 +502,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55601" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61146" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
