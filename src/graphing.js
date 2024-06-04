@@ -1,12 +1,12 @@
 import { findMinMax, toDate } from "./utils"
-//import data1 from "./fl-data-test3.json" //1 свечa
-//import data1 from "./fl-data-test2.json" //2 свечи
-//import data1 from "./fl-data-test.json" // 10 свечей
-import data1 from "./fl-data-test1.json" //30 свечей
-//import data1 from "./fl-data-test4.json" //50 свечей
-//import data1 from "./fl-data-test5.json" //2 свечи и одна пустая
-//import data1 from "./fl-data-test6.json" //3
-//import data1 from "./fl-data.json"  // 1001 свеча0
+//import data1 from "../data/fl-data-test3.json" //1 свечa
+//import data1 from "../data/fl-data-test2.json" //2 свечи
+//import data1 from "../data/fl-data-test.json" // 10 свечей
+import data1 from "../data/fl-data-test1.json" //30 свечей
+//import data1 from "../data/fl-data-test4.json" //50 свечей
+//import data1 from "../data/fl-data-test5.json" //2 свечи и одна пустая
+//import data1 from "../data/fl-data-test6.json" //3
+//import data1 from "../data/fl-data.json"  // 1001 свеча0
 
 const WIDTH = 1300 
 const HEIGHT = 450
@@ -34,6 +34,7 @@ export function graphing (canvas){
      const copiedData = structuredClone(data1)
      let raf
      let action 
+     let xPrev, xPos
    
    
   const proxy = new Proxy({}, {
@@ -60,9 +61,24 @@ export function graphing (canvas){
     },{passive: false})
    
        
-   document.getElementById("canvas").addEventListener("mousemove", function (event) {
-    const x = event.clientX; 
-    curPos = x 
+    document.getElementById("canvas").addEventListener("mousemove", function (event) {
+    curPos = event.clientX; 
+    })
+
+    document.getElementById("canvas").addEventListener("mousedown", function (event) {
+      xPrev = event.clientX; 
+    })
+
+    document.getElementById("canvas").addEventListener("mouseup", function (event) {
+      xPos = event.clientX; 
+      if(xPos - xPrev >= 0){ 
+        action = "mouseLeft"
+        proxy.action = "mouseLeft"
+      }   
+      else{
+       action = "mouseRight"
+       proxy.action = "mouseRight"
+      }
     })
 
     document.getElementById("zoomUp").addEventListener("click", function (e) {
@@ -73,8 +89,8 @@ export function graphing (canvas){
     
     document.getElementById("zoomDown").addEventListener("click", function (e) {
       curPos = DPI_HEIGHT / 2 
-      proxy.scroll = -10
       action = "scroll"
+      proxy.scroll = -10
     })
 
     document.getElementById("buttonRight").addEventListener("click", function (e) {
@@ -143,6 +159,37 @@ export function graphing (canvas){
     } 
   }
 
+  function moveToLeft(datad){
+    let indexd2 = data1.data.o.indexOf(datad.data.o[0]) 
+    if(data1.data.o.indexOf(datad.data.o[datad.data.o.length -1 ])  === 0) return
+      deleteLast(datad)
+      if (indexd2 !== -1){
+        if (data1.data.o[indexd2 - 1 ] !== undefined){
+          addFirst(datad, indexd2 -1 , true )
+        }
+        else if (data1.data.o[indexd2 - 1 ] === undefined){
+           addFirst(datad, indexd2 -1 , false )
+        }
+      }
+      else if (indexd2 === -1 ) addFirst(datad, indexd2 - 1 , false )
+  }
+
+  function moveToRight(datad){
+    let indexd1 = data1.data.o.indexOf(datad.data.o[datad.data.o.length - 1]) 
+    if(data1.data.o.indexOf(datad.data.o[0])  === data1.data.o.length -1) return
+        deleteFirst(datad)
+      if (indexd1 !== -1){
+        if (data1.data.o[indexd1 +1 ] !== undefined){
+          addLast(datad, indexd1 +1 , true )
+        }
+        else if (data1.data.o[indexd1 +1 ] === undefined){
+           addLast(datad, indexd1 +1 , false )
+        }
+      }
+      else if (indexd1 === -1 ) addLast(datad, indexd1 +1 , false )
+
+  }
+
   function getNewDate(datad, scroll, index){
     let indexd1 = data1.data.o.indexOf(datad.data.o[datad.data.o.length - 1]) 
     let indexd2 = data1.data.o.indexOf(datad.data.o[0]) 
@@ -156,37 +203,32 @@ export function graphing (canvas){
          }
       }
       else if (scroll === -10 ){
-        if (data1.data.o[indexd1 +1 ] !== undefined){
-          addLast(datad, indexd1 +1 , true )
+        if ( data1.data.o[indexd1+1]  !== undefined && indexd1!== -1){
+          addLast(datad, indexd1+1 , true )
         }
-        if (data1.data.o[indexd2 -1 ]!== undefined){
+        if ( data1.data.o[indexd2-1] !== undefined && indexd2!== -1){
           addFirst(datad, indexd2-1, true )
         }
       }
     }
     else if(action === "right"){
-        deleteFirst(datad)
-      if (indexd1 !== -1){
-        if (data1.data.o[indexd1 +1 ] !== undefined){
-          addLast(datad, indexd1 +1 , true )
-        }
-        else if (data1.data.o[indexd1 +1 ] === undefined){
-           addLast(datad, indexd1 +1 , false )
-        }
-      }
-      else if (indexd1 === -1 ) addLast(datad, indexd1 +1 , false )
+      moveToRight(datad)
     }
     else if (action === "left"){
-      deleteLast(datad)
-      if (indexd2 !== -1){
-        if (data1.data.o[indexd2 - 1 ] !== undefined){
-          addFirst(datad, indexd2 -1 , true )
-        }
-        else if (data1.data.o[indexd2 - 1 ] === undefined){
-           addFirst(datad, indexd2 -1 , false )
-        }
-      }
-      else if (indexd2 === -1 ) addFirst(datad, indexd2 - 1 , false )
+      moveToLeft(datad)
+    }
+    else if (action === "mouseRight"){
+       const pos1 = Math.trunc(((xPrev * 2 - paddingY)/step))
+       const pos2 = Math.trunc(((xPos * 2 - paddingY)/step))
+       for(let i =0 ; i< pos1-pos2;i++)
+       moveToRight(datad)
+       
+    }
+    else if (action === "mouseLeft"){
+      const pos1 = Math.trunc(((xPrev * 2 - paddingY)/step))
+      const pos2 = Math.trunc(((xPos * 2 - paddingY)/step))
+      for(let i =0 ; i< pos2-pos1;i++)
+      moveToLeft(datad)
     }
   }
 
@@ -206,7 +248,6 @@ export function graphing (canvas){
     const yKof = ((yMax - yMin) / VIEW_HEIGHT)
     const yStep = Math.round(((yMax - yMin) / ROWS_COUNT))
     
-    //console.log(copiedData)
     drawX(copiedData, newLength )
     drawY(yMin, yStep)
     draw(copiedData, newLength,yKof, yMin)

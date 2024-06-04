@@ -144,7 +144,7 @@ function toDate(timestamp) {
   var date = new Date(timestamp);
   return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
 }
-},{}],"fl-data-test1.json":[function(require,module,exports) {
+},{}],"../data/fl-data-test1.json":[function(require,module,exports) {
 module.exports = {
   "status": "success",
   "data": {
@@ -163,21 +163,21 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.graphing = graphing;
 var _utils = require("./utils");
-var _flDataTest = _interopRequireDefault(require("./fl-data-test1.json"));
+var _flDataTest = _interopRequireDefault(require("../data/fl-data-test1.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 from "./fl-data-test3.json" //1 свечa
-//import data1 from "./fl-data-test2.json" //2 свечи
-//import data1 from "./fl-data-test.json" // 10 свечей
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; } //import data1 from "../data/fl-data-test3.json" //1 свечa
+//import data1 from "../data/fl-data-test2.json" //2 свечи
+//import data1 from "../data/fl-data-test.json" // 10 свечей
 //30 свечей
-//import data1 from "./fl-data-test4.json" //50 свечей
-//import data1 from "./fl-data-test5.json" //2 свечи и одна пустая
-//import data1 from "./fl-data-test6.json" //3
-//import data1 from "./fl-data.json"  // 1001 свеча0
+//import data1 from "../data/fl-data-test4.json" //50 свечей
+//import data1 from "../data/fl-data-test5.json" //2 свечи и одна пустая
+//import data1 from "../data/fl-data-test6.json" //3
+//import data1 from "../data/fl-data.json"  // 1001 свеча0
 
 var WIDTH = 1300;
 var HEIGHT = 450;
@@ -202,6 +202,7 @@ function graphing(canvas) {
   var copiedData = structuredClone(_flDataTest.default);
   var raf;
   var action;
+  var xPrev, xPos;
   var proxy = new Proxy({}, {
     set: function set() {
       var result = Reflect.set.apply(Reflect, arguments);
@@ -223,8 +224,20 @@ function graphing(canvas) {
     passive: false
   });
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
-    var x = event.clientX;
-    curPos = x;
+    curPos = event.clientX;
+  });
+  document.getElementById("canvas").addEventListener("mousedown", function (event) {
+    xPrev = event.clientX;
+  });
+  document.getElementById("canvas").addEventListener("mouseup", function (event) {
+    xPos = event.clientX;
+    if (xPos - xPrev >= 0) {
+      action = "mouseLeft";
+      proxy.action = "mouseLeft";
+    } else {
+      action = "mouseRight";
+      proxy.action = "mouseRight";
+    }
   });
   document.getElementById("zoomUp").addEventListener("click", function (e) {
     curPos = DPI_HEIGHT / 2;
@@ -233,8 +246,8 @@ function graphing(canvas) {
   });
   document.getElementById("zoomDown").addEventListener("click", function (e) {
     curPos = DPI_HEIGHT / 2;
-    proxy.scroll = -10;
     action = "scroll";
+    proxy.scroll = -10;
   });
   document.getElementById("buttonRight").addEventListener("click", function (e) {
     curPos = DPI_HEIGHT / 2;
@@ -293,6 +306,30 @@ function graphing(canvas) {
       datad.data.t.unshift(0);
     }
   }
+  function moveToLeft(datad) {
+    var indexd2 = _flDataTest.default.data.o.indexOf(datad.data.o[0]);
+    if (_flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]) === 0) return;
+    deleteLast(datad);
+    if (indexd2 !== -1) {
+      if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
+        addFirst(datad, indexd2 - 1, true);
+      } else if (_flDataTest.default.data.o[indexd2 - 1] === undefined) {
+        addFirst(datad, indexd2 - 1, false);
+      }
+    } else if (indexd2 === -1) addFirst(datad, indexd2 - 1, false);
+  }
+  function moveToRight(datad) {
+    var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
+    if (_flDataTest.default.data.o.indexOf(datad.data.o[0]) === _flDataTest.default.data.o.length - 1) return;
+    deleteFirst(datad);
+    if (indexd1 !== -1) {
+      if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
+        addLast(datad, indexd1 + 1, true);
+      } else if (_flDataTest.default.data.o[indexd1 + 1] === undefined) {
+        addLast(datad, indexd1 + 1, false);
+      }
+    } else if (indexd1 === -1) addLast(datad, indexd1 + 1, false);
+  }
   function getNewDate(datad, scroll, index) {
     var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
     var indexd2 = _flDataTest.default.data.o.indexOf(datad.data.o[0]);
@@ -305,31 +342,25 @@ function graphing(canvas) {
           deleteFirst(datad);
         }
       } else if (scroll === -10) {
-        if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
+        if (_flDataTest.default.data.o[indexd1 + 1] !== undefined && indexd1 !== -1) {
           addLast(datad, indexd1 + 1, true);
         }
-        if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
+        if (_flDataTest.default.data.o[indexd2 - 1] !== undefined && indexd2 !== -1) {
           addFirst(datad, indexd2 - 1, true);
         }
       }
     } else if (action === "right") {
-      deleteFirst(datad);
-      if (indexd1 !== -1) {
-        if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
-          addLast(datad, indexd1 + 1, true);
-        } else if (_flDataTest.default.data.o[indexd1 + 1] === undefined) {
-          addLast(datad, indexd1 + 1, false);
-        }
-      } else if (indexd1 === -1) addLast(datad, indexd1 + 1, false);
+      moveToRight(datad);
     } else if (action === "left") {
-      deleteLast(datad);
-      if (indexd2 !== -1) {
-        if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
-          addFirst(datad, indexd2 - 1, true);
-        } else if (_flDataTest.default.data.o[indexd2 - 1] === undefined) {
-          addFirst(datad, indexd2 - 1, false);
-        }
-      } else if (indexd2 === -1) addFirst(datad, indexd2 - 1, false);
+      moveToLeft(datad);
+    } else if (action === "mouseRight") {
+      var pos1 = Math.trunc((xPrev * 2 - paddingY) / step);
+      var pos2 = Math.trunc((xPos * 2 - paddingY) / step);
+      for (var i = 0; i < pos1 - pos2; i++) moveToRight(datad);
+    } else if (action === "mouseLeft") {
+      var _pos = Math.trunc((xPrev * 2 - paddingY) / step);
+      var _pos2 = Math.trunc((xPos * 2 - paddingY) / step);
+      for (var _i = 0; _i < _pos2 - _pos; _i++) moveToLeft(datad);
     }
   }
   function paint() {
@@ -346,8 +377,6 @@ function graphing(canvas) {
       yMax = _findMinMax2[1];
     var yKof = (yMax - yMin) / VIEW_HEIGHT;
     var yStep = Math.round((yMax - yMin) / ROWS_COUNT);
-
-    //console.log(copiedData)
     drawX(copiedData, newLength);
     drawY(yMin, yStep);
     draw(copiedData, newLength, yKof, yMin);
@@ -416,7 +445,7 @@ function graphing(canvas) {
     }
   }
 }
-},{"./utils":"utils.js","./fl-data-test1.json":"fl-data-test1.json"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"./utils":"utils.js","../data/fl-data-test1.json":"../data/fl-data-test1.json"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -502,7 +531,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61146" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61855" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
