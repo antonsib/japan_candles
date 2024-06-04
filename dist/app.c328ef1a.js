@@ -123,12 +123,13 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.addFirst = addFirst;
+exports.addLast = addLast;
+exports.deleteFirst = deleteFirst;
+exports.deleteLast = deleteLast;
 exports.findMinMax = findMinMax;
 exports.toDate = toDate;
 function findMinMax(data) {
-  //let min = Math.min(...data.data.l)
-  // let max = Math.max(...data.data.h)
-
   var min = 1000000;
   var max = -1;
   for (var i = 0; i < data.data.h.length; i++) {
@@ -143,6 +144,50 @@ function toDate(timestamp) {
   var shortMonth = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   var date = new Date(timestamp);
   return "".concat(shortMonth[date.getMonth()], " ").concat(date.getDate(), " ").concat(date.getHours() + ":" + date.getMinutes() + "0", " ");
+}
+function deleteLast(datad) {
+  datad.data.o.pop();
+  datad.data.h.pop();
+  datad.data.l.pop();
+  datad.data.c.pop();
+  datad.data.t.pop();
+}
+function deleteFirst(datad) {
+  datad.data.o.shift();
+  datad.data.h.shift();
+  datad.data.l.shift();
+  datad.data.c.shift();
+  datad.data.t.shift();
+}
+function addLast(data1, datad, index, isNum) {
+  if (isNum === true) {
+    datad.data.o.push(data1.data.o[index]);
+    datad.data.h.push(data1.data.h[index]);
+    datad.data.l.push(data1.data.l[index]);
+    datad.data.c.push(data1.data.c[index]);
+    datad.data.t.push(data1.data.t[index]);
+  } else if (isNum === false) {
+    datad.data.o.push(0);
+    datad.data.h.push(0);
+    datad.data.l.push(0);
+    datad.data.c.push(0);
+    datad.data.t.push(0);
+  }
+}
+function addFirst(data1, datad, index, isNum) {
+  if (isNum === true) {
+    datad.data.o.unshift(data1.data.o[index]);
+    datad.data.h.unshift(data1.data.h[index]);
+    datad.data.l.unshift(data1.data.l[index]);
+    datad.data.c.unshift(data1.data.c[index]);
+    datad.data.t.unshift(data1.data.t[index]);
+  } else if (isNum === false) {
+    datad.data.o.unshift(0);
+    datad.data.h.unshift(0);
+    datad.data.l.unshift(0);
+    datad.data.c.unshift(0);
+    datad.data.t.unshift(0);
+  }
 }
 },{}],"../data/fl-data-test1.json":[function(require,module,exports) {
 module.exports = {
@@ -262,73 +307,29 @@ function graphing(canvas) {
   function clear() {
     ctx.clearRect(0, 0, DPI_WIDTH, DPI_HEIGHT);
   }
-  function deleteLast(datad) {
-    datad.data.o.pop();
-    datad.data.h.pop();
-    datad.data.l.pop();
-    datad.data.c.pop();
-    datad.data.t.pop();
-  }
-  function deleteFirst(datad) {
-    datad.data.o.shift();
-    datad.data.h.shift();
-    datad.data.l.shift();
-    datad.data.c.shift();
-    datad.data.t.shift();
-  }
-  function addLast(datad, index, isNum) {
-    if (isNum === true) {
-      datad.data.o.push(_flDataTest.default.data.o[index]);
-      datad.data.h.push(_flDataTest.default.data.h[index]);
-      datad.data.l.push(_flDataTest.default.data.l[index]);
-      datad.data.c.push(_flDataTest.default.data.c[index]);
-      datad.data.t.push(_flDataTest.default.data.t[index]);
-    } else if (isNum === false) {
-      datad.data.o.push(0);
-      datad.data.h.push(0);
-      datad.data.l.push(0);
-      datad.data.c.push(0);
-      datad.data.t.push(0);
-    }
-  }
-  function addFirst(datad, index, isNum) {
-    if (isNum === true) {
-      datad.data.o.unshift(_flDataTest.default.data.o[index]);
-      datad.data.h.unshift(_flDataTest.default.data.h[index]);
-      datad.data.l.unshift(_flDataTest.default.data.l[index]);
-      datad.data.c.unshift(_flDataTest.default.data.c[index]);
-      datad.data.t.unshift(_flDataTest.default.data.t[index]);
-    } else if (isNum === false) {
-      datad.data.o.unshift(0);
-      datad.data.h.unshift(0);
-      datad.data.l.unshift(0);
-      datad.data.c.unshift(0);
-      datad.data.t.unshift(0);
-    }
-  }
   function moveToLeft(datad) {
     var indexd2 = _flDataTest.default.data.o.indexOf(datad.data.o[0]);
     if (_flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]) === 0) return;
-    deleteLast(datad);
+    (0, _utils.deleteLast)(datad);
     if (indexd2 !== -1) {
       if (_flDataTest.default.data.o[indexd2 - 1] !== undefined) {
-        addFirst(datad, indexd2 - 1, true);
+        (0, _utils.addFirst)(_flDataTest.default, datad, indexd2 - 1, true);
       } else if (_flDataTest.default.data.o[indexd2 - 1] === undefined) {
-        addFirst(datad, indexd2 - 1, false);
+        (0, _utils.addFirst)(_flDataTest.default, datad, indexd2 - 1, false);
       }
-    } else if (indexd2 === -1) addFirst(datad, indexd2 - 1, false);
+    } else if (indexd2 === -1) (0, _utils.addFirst)(_flDataTest.default, datad, indexd2 - 1, false);
   }
   function moveToRight(datad) {
     var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
     if (_flDataTest.default.data.o.indexOf(datad.data.o[0]) === _flDataTest.default.data.o.length - 1) return;
-    deleteFirst(datad);
+    (0, _utils.deleteFirst)(datad);
     if (indexd1 !== -1) {
       if (_flDataTest.default.data.o[indexd1 + 1] !== undefined) {
-        addLast(datad, indexd1 + 1, true);
+        (0, _utils.addLast)(_flDataTest.default, datad, indexd1 + 1, true);
       } else if (_flDataTest.default.data.o[indexd1 + 1] === undefined) {
-        addLast(datad, indexd1 + 1, false);
+        (0, _utils.addLast)(_flDataTest.default, datad, indexd1 + 1, false);
       }
-    } else if (indexd1 === -1) addLast(datad, indexd1 + 1, false);
+    } else if (indexd1 === -1) (0, _utils.addLast)(_flDataTest.default, datad, indexd1 + 1, false);
   }
   function getNewDate(datad, scroll, index) {
     var indexd1 = _flDataTest.default.data.o.indexOf(datad.data.o[datad.data.o.length - 1]);
@@ -336,17 +337,17 @@ function graphing(canvas) {
     if (action === "scroll") {
       if (scroll === 10) {
         if (datad.data.o[index + 1] !== undefined) {
-          deleteLast(datad);
+          (0, _utils.deleteLast)(datad);
         }
         if (datad.data.o[index - 1] !== undefined) {
-          deleteFirst(datad);
+          (0, _utils.deleteFirst)(datad);
         }
       } else if (scroll === -10) {
         if (_flDataTest.default.data.o[indexd1 + 1] !== undefined && indexd1 !== -1) {
-          addLast(datad, indexd1 + 1, true);
+          (0, _utils.addLast)(_flDataTest.default, datad, indexd1 + 1, true);
         }
         if (_flDataTest.default.data.o[indexd2 - 1] !== undefined && indexd2 !== -1) {
-          addFirst(datad, indexd2 - 1, true);
+          (0, _utils.addFirst)(_flDataTest.default, datad, indexd2 - 1, true);
         }
       }
     } else if (action === "right") {
@@ -531,7 +532,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61855" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57710" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
