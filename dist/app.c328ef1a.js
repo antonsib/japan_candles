@@ -125,6 +125,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.addFirst = addFirst;
 exports.addLast = addLast;
+exports.css = css;
 exports.deleteFirst = deleteFirst;
 exports.deleteLast = deleteLast;
 exports.findMinMax = findMinMax;
@@ -189,7 +190,47 @@ function addFirst(data1, datad, index, isNum) {
     datad.data.t.unshift(0);
   }
 }
-},{}],"../data/fl-data-test1.json":[function(require,module,exports) {
+function css(el) {
+  var styles = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  Object.assign(el.style, styles);
+}
+},{}],"tooltip.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.tooltip = tooltip;
+var _utils = require("./utils");
+var template = function template() {
+  return "\n  <div class=\"tooltip-title\"> 1 </div>\n  hhhhhhhhhhhhhhhhhhhhhhhhh\n  <ul class=\"tooltip-list\">\n      \n    </ul>\n    ";
+};
+function tooltip(el) {
+  var clear = function clear() {
+    return el.innerHTML = '';
+  };
+  return {
+    show: function show(left, top) {
+      var _el$getBoundingClient = el.getBoundingClientRect(),
+        height = _el$getBoundingClient.height,
+        width = _el$getBoundingClient.width;
+      console.log(width.height);
+      clear();
+      (0, _utils.css)(el, {
+        display: 'block',
+        top: top - height + 'px',
+        left: left + width / 2 + 'px'
+      });
+      el.insertAdjacentHTML('afterbegin', template());
+    },
+    hide: function hide() {
+      (0, _utils.css)(el, {
+        display: 'none'
+      });
+    }
+  };
+}
+},{"./utils":"utils.js"}],"../data/fl-data-test1.json":[function(require,module,exports) {
 module.exports = {
   "status": "success",
   "data": {
@@ -208,6 +249,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.graphing = graphing;
 var _utils = require("./utils");
+var _tooltip = require("./tooltip");
 var _flDataTest = _interopRequireDefault(require("../data/fl-data-test1.json"));
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
@@ -232,6 +274,7 @@ var PADDING = 40;
 var VIEW_HEIGHT = DPI_HEIGHT - PADDING * 2;
 var ROWS_COUNT = 10;
 function graphing(canvas) {
+  var tip = (0, _tooltip.tooltip)(document.getElementById('tg-chart-tooltip'));
   var ctx = canvas.getContext('2d');
   canvas.style.width = WIDTH + 'px';
   canvas.style.height = HEIGHT + 'px';
@@ -270,7 +313,23 @@ function graphing(canvas) {
   });
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
     curPos = event.clientX;
+    //proxy.pos = curPos
+    tip.hide();
   });
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  document.getElementById("canvas").addEventListener("click", function (event) {
+    var _canvas$getBoundingCl = canvas.getBoundingClientRect(),
+      left = _canvas$getBoundingCl.left,
+      top = _canvas$getBoundingCl.top; // текущие координаты
+    proxy.tipLeft = event.clientX - left;
+    proxy.tipTop = event.clientY - top;
+    tip.show(proxy.tipLeft, proxy.tipTop);
+  });
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   document.getElementById("canvas").addEventListener("mousedown", function (event) {
     xPrev = event.clientX;
   });
@@ -446,7 +505,7 @@ function graphing(canvas) {
     }
   }
 }
-},{"./utils":"utils.js","../data/fl-data-test1.json":"../data/fl-data-test1.json"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
+},{"./utils":"utils.js","./tooltip":"tooltip.js","../data/fl-data-test1.json":"../data/fl-data-test1.json"}],"../node_modules/parcel-bundler/src/builtins/bundle-url.js":[function(require,module,exports) {
 var bundleURL = null;
 function getBundleURLCached() {
   if (!bundleURL) {
@@ -532,7 +591,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57710" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57972" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

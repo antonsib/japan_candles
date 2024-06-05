@@ -1,4 +1,5 @@
 import { findMinMax, toDate, deleteFirst, deleteLast, addFirst, addLast } from "./utils"
+import { tooltip } from './tooltip'
 //import data1 from "../data/fl-data-test3.json" //1 свечa
 //import data1 from "../data/fl-data-test2.json" //2 свечи
 //import data1 from "../data/fl-data-test.json" // 10 свечей
@@ -18,6 +19,7 @@ const ROWS_COUNT = 10
 
 
 export function graphing (canvas) {
+  const tip = tooltip( document.getElementById('tg-chart-tooltip'))
   const ctx = canvas.getContext('2d')
   canvas.style.width = WIDTH + 'px'
   canvas.style.height = HEIGHT + 'px'
@@ -58,7 +60,21 @@ export function graphing (canvas) {
    
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
     curPos = event.clientX
+    //proxy.pos = curPos
+    tip.hide()
   })
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ document.getElementById("canvas").addEventListener("click", function (event) {
+  const {left , top } = canvas.getBoundingClientRect() // текущие координаты
+  proxy.tipLeft = event.clientX - left
+  proxy.tipTop = event.clientY - top
+  tip.show(proxy.tipLeft, proxy.tipTop)
+  })
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   document.getElementById("canvas").addEventListener("mousedown", function (event) {
     xPrev = event.clientX; 

@@ -79,3 +79,7 @@ export function addFirst(data1,datad, index, isNum) {
     datad.data.t.unshift(0)
   } 
 }
+
+export function css(el, styles = {}){
+  Object.assign(el.style, styles)
+}
