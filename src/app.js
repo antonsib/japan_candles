@@ -1,4 +1,5 @@
 import {graphing} from './graphing.js'
+import './styles.scss'
 
 
 
