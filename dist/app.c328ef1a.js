@@ -202,26 +202,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.tooltip = tooltip;
 var _utils = require("./utils");
-var template = function template() {
-  return "\n  <div class=\"tooltip-title\"> 1 </div>\n  hhhhhhhhhhhhhhhhhhhhhhhhh\n  <ul class=\"tooltip-list\">\n      \n    </ul>\n    ";
+var template = function template(params) {
+  return "\n  <div class=\"tooltip-title\"> \u0418\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F:  </div>\n  <ul class=\"tooltip-list\">\n       <li> \u041C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u0430\u044F \u0446\u0435\u043D\u0430: ".concat(params[0], "</li>\n       <li> \u041C\u0438\u043D\u0438\u043C\u0430\u043B\u044C\u043D\u0430\u044F \u0446\u0435\u043D\u0430: ").concat(params[1], "</li>\n       <li> \u0426\u0435\u043D\u0430 \u043E\u0442\u043A\u0440\u044B\u0442\u0438\u044F: ").concat(params[2], "</li>\n       <li> \u0426\u0435\u043D\u0430 \u0437\u0430\u043A\u0440\u044B\u0442\u0438\u044F: ").concat(params[3], " </li>\n       <li> \u0414\u0430\u0442\u0430 \u0438 \u0432\u0440\u0435\u043C\u044F: ").concat(params[4], " </li>\n    </ul>\n    ");
 };
 function tooltip(el) {
   var clear = function clear() {
     return el.innerHTML = '';
   };
   return {
-    show: function show(left, top) {
+    show: function show(left, top, params) {
       var _el$getBoundingClient = el.getBoundingClientRect(),
         height = _el$getBoundingClient.height,
         width = _el$getBoundingClient.width;
-      console.log(width.height);
       clear();
       (0, _utils.css)(el, {
         display: 'block',
         top: top - height + 'px',
         left: left + width / 2 + 'px'
       });
-      el.insertAdjacentHTML('afterbegin', template());
+      el.insertAdjacentHTML('afterbegin', template(params));
     },
     hide: function hide() {
       (0, _utils.css)(el, {
@@ -313,23 +312,25 @@ function graphing(canvas) {
   });
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
     curPos = event.clientX;
-    //proxy.pos = curPos
     tip.hide();
   });
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   document.getElementById("canvas").addEventListener("click", function (event) {
     var _canvas$getBoundingCl = canvas.getBoundingClientRect(),
       left = _canvas$getBoundingCl.left,
       top = _canvas$getBoundingCl.top; // текущие координаты
-    proxy.tipLeft = event.clientX - left;
-    proxy.tipTop = event.clientY - top;
-    tip.show(proxy.tipLeft, proxy.tipTop);
+    proxy.toolLeft = event.clientX - left;
+    proxy.toolTop = event.clientY - top;
+    var pos = Math.trunc((curPos * 2 - paddingY) / step);
+    var preTime = new Date(copiedData.data.t[pos] * 1000);
+    var time = (0, _utils.toDate)(preTime);
+    var params = [];
+    params.push(copiedData.data.h[pos]);
+    params.push(copiedData.data.l[pos]);
+    params.push(copiedData.data.o[pos]);
+    params.push(copiedData.data.c[pos]);
+    params.push(time);
+    tip.show(proxy.toolLeft, proxy.toolTop, params);
   });
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   document.getElementById("canvas").addEventListener("mousedown", function (event) {
     xPrev = event.clientX;
   });
@@ -591,7 +592,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57972" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60969" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

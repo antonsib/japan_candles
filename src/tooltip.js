@@ -1,28 +1,30 @@
 import {css} from './utils'
 
-const template=()=> `
-  <div class="tooltip-title"> 1 </div>
-  hhhhhhhhhhhhhhhhhhhhhhhhh
+const template=(params)=> `
+  <div class="tooltip-title"> Информация:  </div>
   <ul class="tooltip-list">
-      
+       <li> Максимальная цена: ${params[0]}</li>
+       <li> Минимальная цена: ${params[1]}</li>
+       <li> Цена открытия: ${params[2]}</li>
+       <li> Цена закрытия: ${params[3]} </li>
+       <li> Дата и время: ${params[4]} </li>
     </ul>
     `
 
-export function tooltip (el){
+export function tooltip (el) {
     const clear = () => ( el.innerHTML = '' )
     return {
-        show ( left,  top ){
+        show ( left,  top, params ) {
           const {height, width} = el.getBoundingClientRect()
-          console.log(width.height)
           clear()
-          css(el,{
+          css(el, {
             display : 'block' , 
             top: (top - height) + 'px',
-            left : (left+width / 2) + 'px'
+            left : (left+width / 2) + 'px',
           })
-          el.insertAdjacentHTML('afterbegin',template())
+          el.insertAdjacentHTML('afterbegin',template(params))
         },
-        hide (){
+        hide () {
             css(el, {display : 'none' })
         }
     }

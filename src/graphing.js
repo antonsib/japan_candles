@@ -1,4 +1,4 @@
-import { findMinMax, toDate, deleteFirst, deleteLast, addFirst, addLast } from "./utils"
+import { findMinMax, toDate, deleteFirst, deleteLast, addFirst, addLast, css } from "./utils"
 import { tooltip } from './tooltip'
 //import data1 from "../data/fl-data-test3.json" //1 свечa
 //import data1 from "../data/fl-data-test2.json" //2 свечи
@@ -19,7 +19,7 @@ const ROWS_COUNT = 10
 
 
 export function graphing (canvas) {
-  const tip = tooltip( document.getElementById('tg-chart-tooltip'))
+   const tip = tooltip( document.getElementById('tg-chart-tooltip'))
   const ctx = canvas.getContext('2d')
   canvas.style.width = WIDTH + 'px'
   canvas.style.height = HEIGHT + 'px'
@@ -60,21 +60,25 @@ export function graphing (canvas) {
    
   document.getElementById("canvas").addEventListener("mousemove", function (event) {
     curPos = event.clientX
-    //proxy.pos = curPos
     tip.hide()
   })
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
  document.getElementById("canvas").addEventListener("click", function (event) {
   const {left , top } = canvas.getBoundingClientRect() // текущие координаты
-  proxy.tipLeft = event.clientX - left
-  proxy.tipTop = event.clientY - top
-  tip.show(proxy.tipLeft, proxy.tipTop)
+  proxy.toolLeft = event.clientX - left
+  proxy.toolTop = event.clientY - top
+  const pos = Math.trunc(((curPos * 2 - paddingY)/step))
+  const preTime = new Date(copiedData.data.t[pos] * 1000)
+  const time = toDate(preTime) 
+  let params = []
+  
+  params.push(copiedData.data.h[pos])
+  params.push(copiedData.data.l[pos])
+  params.push(copiedData.data.o[pos])
+  params.push(copiedData.data.c[pos])
+  params.push(time)
+  tip.show(proxy.toolLeft, proxy.toolTop, params)
   })
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   document.getElementById("canvas").addEventListener("mousedown", function (event) {
     xPrev = event.clientX; 
