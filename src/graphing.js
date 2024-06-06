@@ -65,19 +65,19 @@ export function graphing (canvas) {
 
  document.getElementById("canvas").addEventListener("click", function (event) {
   const {left , top } = canvas.getBoundingClientRect() // текущие координаты
-  proxy.toolLeft = event.clientX - left
-  proxy.toolTop = event.clientY - top
+  let toolLeft = event.clientX - left
+  let toolTop = event.clientY - top
   const pos = Math.trunc(((curPos * 2 - paddingY)/step))
   const preTime = new Date(copiedData.data.t[pos] * 1000)
   const time = toDate(preTime) 
   let params = []
-  
+
   params.push(copiedData.data.h[pos])
   params.push(copiedData.data.l[pos])
   params.push(copiedData.data.o[pos])
   params.push(copiedData.data.c[pos])
   params.push(time)
-  tip.show(proxy.toolLeft, proxy.toolTop, params)
+  tip.show(toolLeft, toolTop, params)
   })
 
   document.getElementById("canvas").addEventListener("mousedown", function (event) {

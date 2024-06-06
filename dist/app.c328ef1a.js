@@ -318,8 +318,8 @@ function graphing(canvas) {
     var _canvas$getBoundingCl = canvas.getBoundingClientRect(),
       left = _canvas$getBoundingCl.left,
       top = _canvas$getBoundingCl.top; // текущие координаты
-    proxy.toolLeft = event.clientX - left;
-    proxy.toolTop = event.clientY - top;
+    var toolLeft = event.clientX - left;
+    var toolTop = event.clientY - top;
     var pos = Math.trunc((curPos * 2 - paddingY) / step);
     var preTime = new Date(copiedData.data.t[pos] * 1000);
     var time = (0, _utils.toDate)(preTime);
@@ -329,7 +329,7 @@ function graphing(canvas) {
     params.push(copiedData.data.o[pos]);
     params.push(copiedData.data.c[pos]);
     params.push(time);
-    tip.show(proxy.toolLeft, proxy.toolTop, params);
+    tip.show(toolLeft, toolTop, params);
   });
   document.getElementById("canvas").addEventListener("mousedown", function (event) {
     xPrev = event.clientX;
@@ -592,7 +592,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60969" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49927" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
